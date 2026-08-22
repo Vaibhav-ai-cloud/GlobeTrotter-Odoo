@@ -12,5 +12,6 @@
 	<menuitem id="menu_globetrotter_expenses" name="Expenses" parent="menu_globetrotter_budget" action="action_globetrotter_expense" sequence="10"/>
 	<menuitem id="menu_globetrotter_recommendations" name="Recommendations" parent="menu_globetrotter_root" action="action_globetrotter_recommendation" sequence="25"/>
 	<menuitem id="menu_globetrotter_preferences" name="Profile / Preferences" parent="menu_globetrotter_root" action="action_globetrotter_user_preference" sequence="30"/>
+	<menuitem id="menu_globetrotter_profile" name="Profile" parent="menu_globetrotter_root" action="action_globetrotter_profile" sequence="29"/>
 	<menuitem id="menu_globetrotter_cities" name="Cities" parent="menu_globetrotter_destinations" action="action_globetrotter_city" sequence="20"/>
 </odoo>

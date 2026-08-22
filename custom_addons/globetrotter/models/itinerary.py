@@ -12,6 +12,14 @@ class GlobeTrotterItinerary(models.Model):
         index="trigram",
     )
 
+    trip_id = fields.Many2one(
+        comodel_name="globetrotter.trip",
+        string="Trip",
+        required=True,
+        ondelete="cascade",
+        index=True,
+    )
+
     activity_id = fields.Many2one(
         comodel_name="globetrotter.activity",
         string="Activity",

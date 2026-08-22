@@ -9,3 +9,4 @@ from . import recommendation
 from . import user_preference
 from . import activity
 from . import itinerary
+from . import profile

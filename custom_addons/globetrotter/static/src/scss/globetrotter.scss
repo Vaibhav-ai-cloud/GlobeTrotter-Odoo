@@ -1,0 +1,141 @@
+// ─── GlobeTrotter — Global Form & List UI Polish ─────────────────────────────
+// Applies to all GlobeTrotter views (trips, budget, expenses, itinerary, etc.)
+// Only visual styling — zero logic or security changes.
+
+// ── Design tokens (match dashboard) ──────────────────────────────────────────
+$gt-accent:       #1a6fa8;
+$gt-accent-light: #e8f3fb;
+$gt-accent-dark:  #14578a;
+$gt-green:        #1e8c6a;
+$gt-green-light:  #e6f7f2;
+$gt-amber:        #b46b0a;
+$gt-amber-light:  #fef3e2;
+$gt-red:          #c0392b;
+$gt-red-light:    #fdecea;
+$gt-grey:         #546e7a;
+$gt-grey-light:   #eceff1;
+$gt-border:       #e2eaee;
+$gt-text:         #1a2b38;
+$gt-muted:        #5e7484;
+
+// ── Statusbar polish ─────────────────────────────────────────────────────────
+// Makes the status bar at the top of Trip / Itinerary forms look crisp
+.o_statusbar_status {
+    .o_statusbar_status_button {
+        font-weight: 600;
+        font-size: .8rem;
+        letter-spacing: .01em;
+    }
+}
+
+// ── List view — state decoration colours ─────────────────────────────────────
+// These match Odoo's built-in decoration-* system; keeping separate so they
+// cascade consistently even without decoration attrs.
+.o_list_view {
+    .o_data_row {
+        transition: background 0.12s ease;
+    }
+
+    // Colour rows based on trip state using Odoo's text classes
+    .text-success  { color: $gt-green  !important; font-weight: 600; }
+    .text-warning  { color: $gt-amber  !important; font-weight: 600; }
+    .text-danger   { color: $gt-red    !important; font-weight: 600; }
+    .text-muted    { color: $gt-muted  !important; }
+}
+
+// ── Budget form — readability improvements ────────────────────────────────────
+// Highlight "over budget" status badge
+.o_form_view .o_globetrotter_budget,
+.o_form_view[data-model="globetrotter.budget"] {
+    .o_field_boolean.o_field_widget[name="is_actual_over_budget"] .o_toggle_button,
+    .o_field_boolean.o_field_widget[name="is_over_budget"] .o_toggle_button {
+        pointer-events: none; // readonly indicator, not interactive
+    }
+}
+
+// ── Separator styling — make section headings stand out ──────────────────────
+.o_form_view .o_horizontal_separator {
+    margin: 1.25rem 0 .75rem;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: $gt-accent;
+    border-top: 1px solid $gt-border;
+    padding-top: 1rem;
+    border-bottom: 0;
+}
+
+// ── Avatar / image widget in Profile form ─────────────────────────────────────
+.o_form_view .oe_avatar {
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(26, 43, 56, .12);
+    border: 2px solid $gt-border;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 4px 20px rgba(26, 111, 168, .2);
+        border-color: $gt-accent;
+    }
+}
+
+// ── Notebook tab styling ──────────────────────────────────────────────────────
+.o_notebook .nav-link {
+    font-size: .83rem;
+    font-weight: 600;
+    color: $gt-muted;
+    letter-spacing: .01em;
+    border-radius: 8px 8px 0 0;
+    transition: color 0.15s ease, background 0.15s ease;
+
+    &.active {
+        color: $gt-accent;
+        background: $gt-accent-light;
+    }
+
+    &:hover:not(.active) {
+        color: $gt-text;
+        background: #f5f8fa;
+    }
+}
+
+// ── Budget list — colour over-budget rows ─────────────────────────────────────
+// Relies on Odoo decoration-danger on the list view
+.o_list_view .o_data_row.o_list_record_selected,
+.o_list_view .o_data_row:hover {
+    background: $gt-accent-light;
+}
+
+// ── Inline editable list — visual cues ───────────────────────────────────────
+.o_list_view .o_editable_list .o_field_widget:focus-within {
+    outline: 2px solid rgba(26, 111, 168, .35);
+    border-radius: 4px;
+}
+
+// ── Form sheet header spacing ─────────────────────────────────────────────────
+.o_form_view .o_form_sheet {
+    .oe_title h1 .o_field_widget {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: $gt-text;
+        letter-spacing: -.02em;
+    }
+}
+
+// ── Group string labels ────────────────────────────────────────────────────────
+.o_form_view .o_wrap_field > .o_cell.o_wrap_label > label,
+.o_form_view .o_group .o_field_label {
+    font-size: .82rem;
+    font-weight: 600;
+    color: $gt-muted;
+}
+
+// ── Subtle card shadow for form views ─────────────────────────────────────────
+.o_form_view .o_form_sheet_bg {
+    background: #f0f4f8;
+}
+
+.o_form_view .o_form_sheet {
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(26, 43, 56, .06), 0 3px 18px rgba(26, 43, 56, .04);
+}

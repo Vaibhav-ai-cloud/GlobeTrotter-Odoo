@@ -35,6 +35,7 @@ Core functionality:
         "views/expense_views.xml",
         "views/recommendation_views.xml",
         "views/user_preference_views.xml",
+        "views/profile_views.xml",
         "views/dashboard_views.xml",
         "views/menus.xml",
     ],

@@ -88,15 +88,20 @@ export class GlobeTrotterDashboard extends Component {
 
     formatDate(value) {
         if (!value) {
-            return "-";
+            return "–";
         }
-        return value;
+        try {
+            const d = new Date(value);
+            return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        } catch {
+            return value;
+        }
     }
 
     statusLabel(state) {
         return {
-            draft: "Draft",
-            planned: "Planned",
+            draft:     "Draft",
+            planned:   "Planned",
             completed: "Completed",
             cancelled: "Cancelled",
         }[state] || state;

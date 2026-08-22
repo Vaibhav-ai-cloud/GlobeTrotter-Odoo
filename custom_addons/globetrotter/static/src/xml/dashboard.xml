@@ -2,81 +2,153 @@
 <templates xml:space="preserve">
     <t t-name="globetrotter.Dashboard" owl="1">
         <div class="o_globetrotter_dashboard">
+
+            <!-- ── Header ── -->
             <div class="o_globetrotter_dashboard_header">
                 <div>
-                    <p class="o_globetrotter_eyebrow">TRAVEL PLANNING</p>
-                    <h1>GlobeTrotter Dashboard</h1>
-                    <p class="o_globetrotter_subtitle">A live view of your travel plans and destinations.</p>
+                    <p class="o_globetrotter_eyebrow">✈ Travel Planning Platform</p>
+                    <h1>GlobeTrotter</h1>
+                    <p class="o_globetrotter_subtitle">Live view of your trips, destinations, and travel plans.</p>
                 </div>
-                <button class="btn btn-primary" t-on-click="() => this.openModel('globetrotter.trip')">
+                <button class="btn btn-primary px-4" t-on-click="() => this.openModel('globetrotter.trip')">
                     <i class="fa fa-plus me-2"/>New Trip
                 </button>
             </div>
 
+            <!-- ── Loading / Error ── -->
             <t t-if="state.loading">
-                <div class="o_globetrotter_loading" role="status">Loading dashboard...</div>
+                <div class="o_globetrotter_loading" role="status">
+                    <i class="fa fa-circle-o-notch fa-spin fa-2x mb-2" style="display:block;color:#8eb8cc"/>
+                    Loading dashboard…
+                </div>
             </t>
             <t t-elif="state.error">
-                <div class="alert alert-danger" role="alert">The dashboard could not load its data.</div>
+                <div class="alert alert-danger mt-3" role="alert">
+                    <i class="fa fa-exclamation-circle me-2"/>The dashboard could not load its data. Please refresh the page.
+                </div>
             </t>
             <t t-else="">
+
+                <!-- ── Metric cards ── -->
                 <div class="o_globetrotter_metrics">
-                    <button class="o_globetrotter_metric o_metric_primary" t-on-click="() => this.openModel('globetrotter.trip')">
-                        <span class="o_metric_icon"><i class="fa fa-map-signs"/></span>
+                    <button class="o_globetrotter_metric o_metric_primary"
+                            t-on-click="() => this.openModel('globetrotter.trip')">
+                        <span class="o_metric_icon"><i class="fa fa-suitcase"/></span>
+                        <span class="o_metric_value" t-esc="state.metrics.totalTrips"/>
                         <span class="o_metric_label">Total Trips</span>
-                        <strong t-esc="state.metrics.totalTrips"/>
                     </button>
-                    <button class="o_globetrotter_metric" t-on-click="() => this.openModel('globetrotter.city')">
-                        <span class="o_metric_icon"><i class="fa fa-map-marker"/></span>
-                        <span class="o_metric_label">Cities</span>
-                        <strong t-esc="state.metrics.totalCities"/>
+
+                    <button class="o_globetrotter_metric"
+                            t-on-click="() => this.openModel('globetrotter.city')">
+                        <span class="o_metric_icon" style="background:#e8f7f2;color:#1e8c6a"><i class="fa fa-map-marker"/></span>
+                        <span class="o_metric_value" t-esc="state.metrics.totalCities"/>
+                        <span class="o_metric_label">Destinations</span>
                     </button>
-                    <button class="o_globetrotter_metric" t-on-click="() => this.openModel('globetrotter.trip.stop')">
-                        <span class="o_metric_icon"><i class="fa fa-location-arrow"/></span>
+
+                    <button class="o_globetrotter_metric"
+                            t-on-click="() => this.openModel('globetrotter.trip.stop')">
+                        <span class="o_metric_icon" style="background:#fef3e2;color:#b46b0a"><i class="fa fa-location-arrow"/></span>
+                        <span class="o_metric_value" t-esc="state.metrics.totalStops"/>
                         <span class="o_metric_label">Trip Stops</span>
-                        <strong t-esc="state.metrics.totalStops"/>
                     </button>
-                    <button class="o_globetrotter_metric" t-on-click="() => this.openModel('globetrotter.trip.stop')">
-                        <span class="o_metric_icon"><i class="fa fa-calendar"/></span>
+
+                    <button class="o_globetrotter_metric"
+                            t-on-click="() => this.openModel('globetrotter.trip.stop')">
+                        <span class="o_metric_icon" style="background:#f3e8fb;color:#7b3fbf"><i class="fa fa-calendar-check-o"/></span>
+                        <span class="o_metric_value" t-esc="state.metrics.totalDays"/>
                         <span class="o_metric_label">Planned Days</span>
-                        <strong t-esc="state.metrics.totalDays"/>
                     </button>
                 </div>
 
+                <!-- ── Two-column panels ── -->
                 <div class="o_globetrotter_columns">
+
+                    <!-- Trip Pipeline -->
                     <section class="o_globetrotter_panel">
                         <div class="o_panel_heading">
-                            <div><p class="o_globetrotter_eyebrow">STATUS OVERVIEW</p><h2>Trip pipeline</h2></div>
-                            <button class="btn btn-link" t-on-click="() => this.openModel('globetrotter.trip')">View all <i class="fa fa-arrow-right ms-1"/></button>
+                            <div>
+                                <p class="o_globetrotter_eyebrow">Status Overview</p>
+                                <h2>Trip Pipeline</h2>
+                            </div>
+                            <button class="btn btn-link" t-on-click="() => this.openModel('globetrotter.trip')">
+                                View all <i class="fa fa-arrow-right ms-1"/>
+                            </button>
                         </div>
+
                         <div class="o_status_rows">
-                            <button class="o_status_row" t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'draft']])"><span><i class="fa fa-pencil"/> Draft</span><strong t-esc="state.metrics.draftTrips"/></button>
-                            <button class="o_status_row" t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'planned']])"><span><i class="fa fa-clock-o"/> Planned</span><strong t-esc="state.metrics.plannedTrips"/></button>
-                            <button class="o_status_row" t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'completed']])"><span><i class="fa fa-check-circle"/> Completed</span><strong t-esc="state.metrics.completedTrips"/></button>
-                            <button class="o_status_row" t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'cancelled']])"><span><i class="fa fa-ban"/> Cancelled</span><strong t-esc="state.metrics.cancelledTrips"/></button>
+                            <button class="o_status_row"
+                                    t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'draft']])">
+                                <span class="o_status_row_label">
+                                    <span class="o_status_dot o_dot_draft"/>Draft
+                                </span>
+                                <strong t-esc="state.metrics.draftTrips"/>
+                            </button>
+
+                            <button class="o_status_row"
+                                    t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'planned']])">
+                                <span class="o_status_row_label">
+                                    <span class="o_status_dot o_dot_planned"/>Planned
+                                </span>
+                                <strong t-esc="state.metrics.plannedTrips"/>
+                            </button>
+
+                            <button class="o_status_row"
+                                    t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'completed']])">
+                                <span class="o_status_row_label">
+                                    <span class="o_status_dot o_dot_completed"/>Completed
+                                </span>
+                                <strong t-esc="state.metrics.completedTrips"/>
+                            </button>
+
+                            <button class="o_status_row"
+                                    t-on-click="() => this.openModel('globetrotter.trip', [['state', '=', 'cancelled']])">
+                                <span class="o_status_row_label">
+                                    <span class="o_status_dot o_dot_cancelled"/>Cancelled
+                                </span>
+                                <strong t-esc="state.metrics.cancelledTrips"/>
+                            </button>
                         </div>
                     </section>
 
-                    <section class="o_globetrotter_panel o_recent_panel">
+                    <!-- Recent Trips -->
+                    <section class="o_globetrotter_panel">
                         <div class="o_panel_heading">
-                            <div><p class="o_globetrotter_eyebrow">LATEST PLANS</p><h2>Recent trips</h2></div>
+                            <div>
+                                <p class="o_globetrotter_eyebrow">Latest Plans</p>
+                                <h2>Recent Trips</h2>
+                            </div>
                         </div>
+
                         <t t-if="!state.recentTrips.length">
-                            <div class="o_empty_state">No trips have been created yet.</div>
+                            <div class="o_empty_state">
+                                <i class="fa fa-map-o"/>
+                                No trips created yet. Start planning your first adventure!
+                            </div>
                         </t>
                         <t t-else="">
                             <div class="o_recent_trips">
                                 <t t-foreach="state.recentTrips" t-as="trip" t-key="trip.id">
                                     <button class="o_recent_trip" t-on-click="() => this.openTrip(trip)">
-                                        <span class="o_trip_marker"/>
-                                        <span class="o_trip_details"><strong t-esc="trip.name"/><small><t t-esc="formatDate(trip.start_date)"/> to <t t-esc="formatDate(trip.end_date)"/></small></span>
-                                        <span class="o_trip_meta"><span t-att-class="'o_trip_state o_state_' + trip.state" t-esc="statusLabel(trip.state)"/><small><t t-esc="trip.stop_count"/> stops</small></span>
+                                        <span class="o_trip_avatar"><i class="fa fa-plane"/></span>
+                                        <span class="o_trip_details">
+                                            <strong t-esc="trip.name"/>
+                                            <small>
+                                                <t t-esc="formatDate(trip.start_date)"/>
+                                                <t t-if="trip.end_date"> → <t t-esc="formatDate(trip.end_date)"/></t>
+                                            </small>
+                                        </span>
+                                        <span class="o_trip_meta">
+                                            <span t-att-class="'o_trip_state o_state_' + trip.state"
+                                                  t-esc="statusLabel(trip.state)"/>
+                                            <small><t t-esc="trip.stop_count"/> <t t-if="trip.stop_count === 1">stop</t><t t-else="">stops</t></small>
+                                        </span>
                                     </button>
                                 </t>
                             </div>
                         </t>
                     </section>
-                </div>
+
+                </div><!-- /columns -->
             </t>
         </div>
     </t>

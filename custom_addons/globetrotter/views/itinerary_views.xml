@@ -9,6 +9,7 @@
             <list string="Itineraries">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
+                <field name="trip_id"/>
                 <field name="activity_id"/>
                 <field name="start_datetime"/>
                 <field name="end_datetime"/>
@@ -34,6 +35,7 @@
 
                     <group>
                         <group string="Schedule">
+                            <field name="trip_id"/>
                             <field name="activity_id"/>
                             <field name="start_datetime"/>
                             <field name="end_datetime"/>
@@ -61,6 +63,7 @@
         <field name="arch" type="xml">
             <search string="Search Itineraries">
                 <field name="name"/>
+                <field name="trip_id"/>
                 <field name="activity_id"/>
                 <field name="status"/>
 
@@ -70,6 +73,11 @@
                     domain="[('active', '=', True)]"
                 />
 
+                <filter
+                    name="group_by_trip"
+                    string="Trip"
+                    context="{'group_by': 'trip_id'}"
+                />
                 <filter
                         name="group_by_activity"
                         string="Activity"
