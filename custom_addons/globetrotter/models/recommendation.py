@@ -86,10 +86,37 @@ class GlobeTrotterRecommendation(models.Model):
         return True
 
     @api.model
+    
+    def _get_current_user_preference(self):
+        return self.env["globetrotter.user.preference"].search(
+            [("user_id", "=", self.env.user.id), ("active", "=", True)],
+            limit=1,
+        )
     def generate_budget_recommendations(self, trip_id):
         """Generate budget recommendations for one trip."""
         if not trip_id:
-            return self.browse()
+            preference = self._get_current_user_preference()
+
+            warning_threshold = 80.0
+            optimization_ratio = 0.40
+            saving_ratio = 0.10
+
+            if preference:
+                if preference.travel_style == "budget":
+                    warning_threshold = 70.0
+                    optimization_ratio = 0.30
+                    saving_ratio = 0.15
+
+                elif preference.travel_style == "premium":
+                    warning_threshold = 90.0
+                    optimization_ratio = 0.50
+                    saving_ratio = 0.05
+
+                if preference.prefers_low_cost:
+                    warning_threshold = min(warning_threshold, 70.0)
+                    saving_ratio = max(saving_ratio, 0.15)
+        
+        return self.browse()
 
         Budget = self.env["globetrotter.budget"]
 
@@ -155,7 +182,7 @@ class GlobeTrotterRecommendation(models.Model):
             )
 
         # Budget usage is getting high.
-        elif budget.actual_usage >= 80:
+        elif budget.actual_usage >= warning_threshold:
             recommendations |= self.create(
                 {
                     "name": "Budget usage is high",
@@ -210,9 +237,9 @@ class GlobeTrotterRecommendation(models.Model):
 
         if (
             budget.total_budget > 0
-            and largest_amount > budget.total_budget * 0.40
+            and largest_amount > budget.total_budget * optimization_ratio
         ):
-            possible_saving = largest_amount * 0.10
+            possible_saving = largest_amount * saving_ratio
 
             recommendations |= self.create(
                 {

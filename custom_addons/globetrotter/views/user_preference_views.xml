@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_globetrotter_user_preference_list" model="ir.ui.view">
+        <field name="name">globetrotter.user.preference.list</field>
+        <field name="model">globetrotter.user.preference</field>
+        <field name="arch" type="xml">
+            <list string="Travel Preferences">
+                <field name="user_id"/>
+                <field name="travel_style"/>
+                <field name="preferred_activity_type"/>
+                <field name="daily_budget"/>
+                <field name="prefers_low_cost"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_globetrotter_user_preference_form" model="ir.ui.view">
+        <field name="name">globetrotter.user.preference.form</field>
+        <field name="model">globetrotter.user.preference</field>
+        <field name="arch" type="xml">
+            <form string="Travel Preferences">
+                <sheet>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="user_id"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Travel Style">
+                            <field name="travel_style"/>
+                            <field name="preferred_activity_type"/>
+                            <field name="prefers_low_cost"/>
+                        </group>
+
+                        <group string="Budget Preference">
+                            <field name="currency_id"/>
+                            <field name="daily_budget"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+
+                    <group string="Additional Preferences">
+                        <field
+                            name="notes"
+                            placeholder="Add travel interests, preferences or special notes..."
+                        />
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_globetrotter_user_preference_search" model="ir.ui.view">
+        <field name="name">globetrotter.user.preference.search</field>
+        <field name="model">globetrotter.user.preference</field>
+        <field name="arch" type="xml">
+            <search string="Search Travel Preferences">
+
+                <field name="user_id"/>
+                <field name="travel_style"/>
+                <field name="preferred_activity_type"/>
+
+                <filter
+                    string="Budget Travelers"
+                    name="budget_travelers"
+                    domain="[('travel_style', '=', 'budget')]"
+                />
+
+                <filter
+                    string="Cost Saving"
+                    name="cost_saving"
+                    domain="[('prefers_low_cost', '=', True)]"
+                />
+
+                <group expand="0" string="Group By">
+                    <filter
+                        string="Travel Style"
+                        name="group_by_travel_style"
+                        context="{'group_by': 'travel_style'}"
+                    />
+
+                    <filter
+                        string="Activity Type"
+                        name="group_by_activity_type"
+                        context="{'group_by': 'preferred_activity_type'}"
+                    />
+                </group>
+
+            </search>
+        </field>
+    </record>
+
+</odoo>
