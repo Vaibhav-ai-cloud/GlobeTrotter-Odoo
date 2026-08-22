@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_globetrotter_expense_list" model="ir.ui.view">
+        <field name="name">globetrotter.expense.list</field>
+        <field name="model">globetrotter.expense</field>
+        <field name="arch" type="xml">
+            <list string="Trip Expenses" default_order="expense_date desc">
+                <field name="expense_date"/>
+                <field name="name"/>
+                <field name="trip_id"/>
+                <field name="budget_id"/>
+                <field name="category"/>
+                <field name="amount"/>
+                <field name="is_planned"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_globetrotter_expense_form" model="ir.ui.view">
+        <field name="name">globetrotter.expense.form</field>
+        <field name="model">globetrotter.expense</field>
+        <field name="arch" type="xml">
+            <form string="Trip Expense">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Expense"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Expense Details">
+                            <field name="trip_id"/>
+                            <field name="budget_id"/>
+                            <field name="category"/>
+                            <field name="expense_date"/>
+                        </group>
+
+                        <group string="Amount">
+                            <field name="currency_id"/>
+                            <field name="amount"/>
+                            <field name="is_planned"/>
+                        </group>
+                    </group>
+
+                    <group string="Notes">
+                        <field name="description" placeholder="Expense notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_globetrotter_expense_search" model="ir.ui.view">
+        <field name="name">globetrotter.expense.search</field>
+        <field name="model">globetrotter.expense</field>
+        <field name="arch" type="xml">
+            <search string="Search Expenses">
+                <field name="name"/>
+                <field name="trip_id"/>
+                <field name="budget_id"/>
+                <field name="category"/>
+
+                <filter
+                    string="Planned"
+                    name="planned"
+                    domain="[('is_planned', '=', True)]"
+                />
+
+                <filter
+                    string="Actual"
+                    name="actual"
+                    domain="[('is_planned', '=', False)]"
+                />
+
+                <group expand="0" string="Group By">
+                    <filter
+                        string="Trip"
+                        name="group_by_trip"
+                        context="{'group_by': 'trip_id'}"
+                    />
+
+                    <filter
+                        string="Category"
+                        name="group_by_category"
+                        context="{'group_by': 'category'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
