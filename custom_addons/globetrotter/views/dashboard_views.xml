@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_globetrotter_dashboard" model="ir.actions.client">
+        <field name="name">GlobeTrotter Dashboard</field>
+        <field name="tag">globetrotter.dashboard</field>
+    </record>
+</odoo>

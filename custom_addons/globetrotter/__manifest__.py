@@ -29,12 +29,14 @@ Core functionality:
         "views/trip_views.xml",
         "views/trip_stop_views.xml",
         "views/city_views.xml",
+        "views/dashboard_views.xml",
         "views/menus.xml",
     ],
     "assets": {
         "web.assets_backend": [
             "globetrotter/static/src/scss/*.scss",
             "globetrotter/static/src/js/*.js",
+            "globetrotter/static/src/xml/*.xml",
         ],
     },
     "installable": True,

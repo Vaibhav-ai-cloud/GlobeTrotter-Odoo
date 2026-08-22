@@ -1,0 +1,156 @@
+.o_globetrotter_dashboard {
+    min-height: 100%;
+    padding: 2.5rem clamp(1.25rem, 4vw, 4rem);
+    background: #f4f6f3;
+    color: #24312d;
+}
+
+.o_globetrotter_dashboard_header,
+.o_panel_heading,
+.o_status_row,
+.o_recent_trip {
+    display: flex;
+    align-items: center;
+}
+
+.o_globetrotter_dashboard_header {
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+}
+
+.o_globetrotter_dashboard h1,
+.o_globetrotter_dashboard h2,
+.o_globetrotter_dashboard p {
+    margin-top: 0;
+}
+
+.o_globetrotter_dashboard h1 {
+    margin-bottom: .35rem;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.o_globetrotter_dashboard h2 {
+    margin-bottom: 0;
+    font-size: 1.25rem;
+    letter-spacing: 0;
+}
+
+.o_globetrotter_eyebrow {
+    margin-bottom: .35rem;
+    color: #64766e;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+}
+
+.o_globetrotter_subtitle {
+    color: #64766e;
+}
+
+.o_globetrotter_metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto 1rem;
+}
+
+.o_globetrotter_metric {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: .8rem;
+    align-items: center;
+    min-height: 130px;
+    padding: 1.2rem;
+    border: 1px solid #dce4df;
+    border-radius: 8px;
+    background: #fff;
+    color: #24312d;
+    text-align: left;
+}
+
+.o_globetrotter_metric:hover,
+.o_recent_trip:hover,
+.o_status_row:hover {
+    border-color: #91ad9e;
+    background: #f8fbf8;
+}
+
+.o_metric_icon {
+    grid-row: 1 / span 2;
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e4f0e8;
+    color: #27734d;
+    font-size: 1.1rem;
+}
+
+.o_metric_primary {
+    border-color: #27734d;
+    background: #27734d;
+    color: #fff;
+}
+
+.o_metric_primary .o_metric_icon { background: #4b926b; color: #fff; }
+.o_metric_primary .o_metric_label { color: #d8efe0; }
+.o_metric_label { color: #64766e; font-size: .8rem; }
+.o_globetrotter_metric strong { font-size: 1.8rem; line-height: 1; }
+
+.o_globetrotter_columns {
+    display: grid;
+    grid-template-columns: minmax(260px, .8fr) minmax(360px, 1.2fr);
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.o_globetrotter_panel {
+    min-width: 0;
+    padding: 1.4rem;
+    border: 1px solid #dce4df;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.o_panel_heading { justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.o_panel_heading .btn-link { padding-right: 0; color: #27734d; white-space: nowrap; }
+.o_status_rows { border-top: 1px solid #edf1ee; }
+.o_status_row { justify-content: space-between; width: 100%; padding: .9rem 0; border: 0; border-bottom: 1px solid #edf1ee; background: transparent; color: #24312d; text-align: left; }
+.o_status_row span { color: #52635b; }
+.o_status_row i { width: 1.2rem; color: #27734d; }
+.o_status_row strong { font-size: 1.1rem; }
+.o_recent_trips { border-top: 1px solid #edf1ee; }
+.o_recent_trip { width: 100%; gap: .8rem; padding: .85rem 0; border: 0; border-bottom: 1px solid #edf1ee; background: transparent; color: #24312d; text-align: left; }
+.o_trip_marker { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: #d2874b; }
+.o_trip_details { display: grid; flex: 1; gap: .25rem; min-width: 0; }
+.o_trip_details strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.o_trip_details small,
+.o_trip_meta small { color: #788981; }
+.o_trip_meta { display: grid; justify-items: end; gap: .25rem; }
+.o_trip_state { padding: .2rem .45rem; border-radius: 4px; font-size: .7rem; font-weight: 600; }
+.o_state_draft { background: #eef1f2; color: #58656b; }
+.o_state_planned { background: #fff1d9; color: #9a641d; }
+.o_state_completed { background: #e4f0e8; color: #27734d; }
+.o_state_cancelled { background: #fbe7e5; color: #a4473c; }
+.o_empty_state,
+.o_globetrotter_loading { padding: 2rem 0; color: #788981; text-align: center; }
+
+@media (max-width: 900px) {
+    .o_globetrotter_metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .o_globetrotter_columns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+    .o_globetrotter_dashboard { padding: 1.25rem; }
+    .o_globetrotter_dashboard_header { align-items: flex-start; flex-direction: column; }
+    .o_globetrotter_dashboard_header .btn { width: 100%; }
+    .o_globetrotter_metrics { grid-template-columns: 1fr; }
+}
