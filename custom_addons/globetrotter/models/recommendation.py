@@ -74,6 +74,7 @@ class GlobeTrotterRecommendation(models.Model):
     )
 
     active = fields.Boolean(
+        string="Active",
         default=True,
     )
 
@@ -86,37 +87,21 @@ class GlobeTrotterRecommendation(models.Model):
         return True
 
     @api.model
-    
     def _get_current_user_preference(self):
         return self.env["globetrotter.user.preference"].search(
-            [("user_id", "=", self.env.user.id), ("active", "=", True)],
+            [
+                ("user_id", "=", self.env.user.id),
+                ("active", "=", True),
+            ],
             limit=1,
         )
+
+    @api.model
     def generate_budget_recommendations(self, trip_id):
-        """Generate budget recommendations for one trip."""
+        """Generate smart budget recommendations for one trip."""
+
         if not trip_id:
-            preference = self._get_current_user_preference()
-
-            warning_threshold = 80.0
-            optimization_ratio = 0.40
-            saving_ratio = 0.10
-
-            if preference:
-                if preference.travel_style == "budget":
-                    warning_threshold = 70.0
-                    optimization_ratio = 0.30
-                    saving_ratio = 0.15
-
-                elif preference.travel_style == "premium":
-                    warning_threshold = 90.0
-                    optimization_ratio = 0.50
-                    saving_ratio = 0.05
-
-                if preference.prefers_low_cost:
-                    warning_threshold = min(warning_threshold, 70.0)
-                    saving_ratio = max(saving_ratio, 0.15)
-        
-        return self.browse()
+            return self.browse()
 
         Budget = self.env["globetrotter.budget"]
 
@@ -129,8 +114,37 @@ class GlobeTrotterRecommendation(models.Model):
         if not budget:
             return self.browse()
 
-        # Remove only previous active/new budget suggestions generated
-        # for this budget. Accepted/dismissed history stays untouched.
+        preference = self._get_current_user_preference()
+
+        # Default recommendation sensitivity.
+        warning_threshold = 80.0
+        optimization_ratio = 0.40
+        saving_ratio = 0.10
+
+        # Personalize thresholds using the user's travel style.
+        if preference:
+            if preference.travel_style == "budget":
+                warning_threshold = 70.0
+                optimization_ratio = 0.30
+                saving_ratio = 0.15
+
+            elif preference.travel_style == "premium":
+                warning_threshold = 90.0
+                optimization_ratio = 0.50
+                saving_ratio = 0.05
+
+            if preference.prefers_low_cost:
+                warning_threshold = min(
+                    warning_threshold,
+                    70.0,
+                )
+                saving_ratio = max(
+                    saving_ratio,
+                    0.15,
+                )
+
+        # Remove previous NEW budget suggestions for this budget.
+        # Accepted/dismissed recommendation history is preserved.
         old_recommendations = self.search(
             [
                 ("trip_id", "=", trip_id),
@@ -139,10 +153,12 @@ class GlobeTrotterRecommendation(models.Model):
                 ("state", "=", "new"),
             ]
         )
+
         old_recommendations.unlink()
 
         recommendations = self.browse()
 
+        # No total budget configured.
         if budget.total_budget <= 0:
             recommendations |= self.create(
                 {
@@ -158,11 +174,14 @@ class GlobeTrotterRecommendation(models.Model):
                     "score": 100.0,
                 }
             )
+
             return recommendations
 
-        # Actual spending has crossed the total budget.
+        # Actual trip spending exceeded total budget.
         if budget.actual_spent > budget.total_budget:
-            exceeded_by = budget.actual_spent - budget.total_budget
+            exceeded_by = (
+                budget.actual_spent - budget.total_budget
+            )
 
             recommendations |= self.create(
                 {
@@ -171,9 +190,10 @@ class GlobeTrotterRecommendation(models.Model):
                     "budget_id": budget.id,
                     "recommendation_type": "budget",
                     "message": (
-                        f"Your actual trip spending exceeds the total "
-                        f"budget by {exceeded_by:.2f}. Review high-cost "
-                        f"categories before adding more expenses."
+                        "Your actual trip spending exceeds the "
+                        f"total budget by {exceeded_by:.2f}. "
+                        "Review high-cost categories before "
+                        "adding more expenses."
                     ),
                     "estimated_saving": exceeded_by,
                     "currency_id": budget.currency_id.id,
@@ -181,7 +201,7 @@ class GlobeTrotterRecommendation(models.Model):
                 }
             )
 
-        # Budget usage is getting high.
+        # Spending is approaching total budget.
         elif budget.actual_usage >= warning_threshold:
             recommendations |= self.create(
                 {
@@ -191,8 +211,9 @@ class GlobeTrotterRecommendation(models.Model):
                     "recommendation_type": "budget",
                     "message": (
                         f"You have already used "
-                        f"{budget.actual_usage:.1f}% of your trip budget. "
-                        f"Consider lower-cost options for upcoming expenses."
+                        f"{budget.actual_usage:.1f}% of your trip "
+                        "budget. Consider lower-cost options for "
+                        "upcoming expenses."
                     ),
                     "currency_id": budget.currency_id.id,
                     "score": 85.0,
@@ -201,7 +222,9 @@ class GlobeTrotterRecommendation(models.Model):
 
         # Planned expenses exceed available budget.
         if budget.planned_total > budget.total_budget:
-            planned_excess = budget.planned_total - budget.total_budget
+            planned_excess = (
+                budget.planned_total - budget.total_budget
+            )
 
             recommendations |= self.create(
                 {
@@ -211,15 +234,17 @@ class GlobeTrotterRecommendation(models.Model):
                     "recommendation_type": "budget",
                     "message": (
                         f"Your planned trip cost is "
-                        f"{planned_excess:.2f} above the available budget. "
-                        f"Reduce one or more planned expense categories."
+                        f"{planned_excess:.2f} above the available "
+                        "budget. Reduce one or more planned expense "
+                        "categories."
                     ),
                     "estimated_saving": planned_excess,
                     "currency_id": budget.currency_id.id,
                     "score": 90.0,
                 }
             )
-            
+
+        # Detect category-level overspending.
         category_checks = [
             (
                 "transport",
@@ -248,34 +273,49 @@ class GlobeTrotterRecommendation(models.Model):
             ),
         ]
 
-        for category_name, planned_amount, actual_amount in category_checks:
+        for (
+            category_name,
+            planned_amount,
+            actual_amount,
+        ) in category_checks:
+
             if planned_amount <= 0:
                 continue
 
-            if actual_amount > planned_amount:
-                overspent = actual_amount - planned_amount
-                overspend_percent = (overspent / planned_amount) * 100
+            if actual_amount <= planned_amount:
+                continue
 
-                if overspend_percent >= 10:
-                    recommendations |= self.create(
-                        {
-                            "name": f"{category_name.title()} spending is high",
-                            "trip_id": trip_id,
-                            "budget_id": budget.id,
-                            "recommendation_type": "budget",
-                            "message": (
-                                f"Actual {category_name} spending is "
-                                f"{overspend_percent:.1f}% above the planned amount. "
-                                f"Review upcoming {category_name} expenses and "
-                                f"consider lower-cost alternatives."
-                            ),
-                            "estimated_saving": overspent,
-                            "currency_id": budget.currency_id.id,
-                            "score": 80.0,
-                        }
-                    )
+            overspent = actual_amount - planned_amount
 
-        # Identify the largest planned cost category.
+            overspend_percent = (
+                overspent / planned_amount
+            ) * 100
+
+            if overspend_percent < 10:
+                continue
+
+            recommendations |= self.create(
+                {
+                    "name": (
+                        f"{category_name.title()} spending is high"
+                    ),
+                    "trip_id": trip_id,
+                    "budget_id": budget.id,
+                    "recommendation_type": "budget",
+                    "message": (
+                        f"Actual {category_name} spending is "
+                        f"{overspend_percent:.1f}% above the planned "
+                        f"amount. Review upcoming {category_name} "
+                        "expenses and consider lower-cost "
+                        "alternatives."
+                    ),
+                    "estimated_saving": overspent,
+                    "currency_id": budget.currency_id.id,
+                    "score": 80.0,
+                }
+            )
+
+        # Identify largest planned cost category.
         category_amounts = {
             "transport": budget.transport_budget,
             "stay": budget.accommodation_budget,
@@ -288,24 +328,33 @@ class GlobeTrotterRecommendation(models.Model):
             category_amounts,
             key=category_amounts.get,
         )
-        largest_amount = category_amounts[largest_category]
+
+        largest_amount = category_amounts[
+            largest_category
+        ]
 
         if (
             budget.total_budget > 0
-            and largest_amount > budget.total_budget * optimization_ratio
+            and largest_amount
+            > budget.total_budget * optimization_ratio
         ):
-            possible_saving = largest_amount * saving_ratio
+            possible_saving = (
+                largest_amount * saving_ratio
+            )
 
             recommendations |= self.create(
                 {
-                    "name": f"Optimize {largest_category} cost",
+                    "name": (
+                        f"Optimize {largest_category} cost"
+                    ),
                     "trip_id": trip_id,
                     "budget_id": budget.id,
                     "recommendation_type": "budget",
                     "message": (
-                        f"{largest_category.title()} represents a large "
-                        f"share of your planned budget. Comparing lower-cost "
-                        f"alternatives could reduce your overall trip cost."
+                        f"{largest_category.title()} represents a "
+                        "large share of your planned budget. "
+                        "Comparing lower-cost alternatives could "
+                        "reduce your overall trip cost."
                     ),
                     "estimated_saving": possible_saving,
                     "currency_id": budget.currency_id.id,
@@ -314,3 +363,41 @@ class GlobeTrotterRecommendation(models.Model):
             )
 
         return recommendations
+
+    def action_refresh_budget_recommendations(self):
+        """Regenerate budget recommendations for selected trips."""
+
+        trips = self.mapped("trip_id")
+
+        if not trips:
+            return True
+
+        self.filtered(
+            lambda recommendation: (
+                recommendation.recommendation_type == "budget"
+                and recommendation.state == "new"
+            )
+        ).unlink()
+
+        created_recommendations = self.browse()
+
+        for trip in trips:
+            created_recommendations |= (
+                self.generate_budget_recommendations(
+                    trip.id
+                )
+            )
+
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Trip Recommendations",
+            "res_model": "globetrotter.recommendation",
+            "view_mode": "list,form",
+            "domain": [
+                (
+                    "id",
+                    "in",
+                    created_recommendations.ids,
+                )
+            ],
+        }
