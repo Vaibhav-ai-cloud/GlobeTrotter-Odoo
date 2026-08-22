@@ -23,6 +23,13 @@
             <form string="Trip Recommendation">
                 <header>
                     <button
+                        name="action_refresh_budget_recommendations"
+                        type="object"
+                        string="Refresh Suggestions"
+                        class="btn-secondary"
+                    />
+
+                    <button
                         name="action_accept"
                         type="object"
                         string="Accept"
