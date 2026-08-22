@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_globetrotter_recommendation_list" model="ir.ui.view">
+        <field name="name">globetrotter.recommendation.list</field>
+        <field name="model">globetrotter.recommendation</field>
+        <field name="arch" type="xml">
+            <list string="Trip Recommendations" default_order="score desc">
+                <field name="name"/>
+                <field name="trip_id"/>
+                <field name="recommendation_type"/>
+                <field name="score"/>
+                <field name="estimated_saving"/>
+                <field name="state"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_globetrotter_recommendation_form" model="ir.ui.view">
+        <field name="name">globetrotter.recommendation.form</field>
+        <field name="model">globetrotter.recommendation</field>
+        <field name="arch" type="xml">
+            <form string="Trip Recommendation">
+                <header>
+                    <button
+                        name="action_accept"
+                        type="object"
+                        string="Accept"
+                        class="btn-primary"
+                        invisible="state != 'new'"
+                    />
+
+                    <button
+                        name="action_dismiss"
+                        type="object"
+                        string="Dismiss"
+                        invisible="state != 'new'"
+                    />
+
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="new,accepted,dismissed"
+                    />
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Recommendation">
+                            <field name="trip_id"/>
+                            <field name="budget_id"/>
+                            <field name="recommendation_type"/>
+                            <field name="score"/>
+                        </group>
+
+                        <group string="Savings">
+                            <field name="currency_id"/>
+                            <field name="estimated_saving"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+
+                    <group string="Suggestion">
+                        <field
+                            name="message"
+                            nolabel="1"
+                            placeholder="Recommendation details..."
+                        />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_globetrotter_recommendation_search" model="ir.ui.view">
+        <field name="name">globetrotter.recommendation.search</field>
+        <field name="model">globetrotter.recommendation</field>
+        <field name="arch" type="xml">
+            <search string="Search Recommendations">
+                <field name="name"/>
+                <field name="trip_id"/>
+                <field name="recommendation_type"/>
+
+                <filter
+                    string="New"
+                    name="new_recommendations"
+                    domain="[('state', '=', 'new')]"
+                />
+
+                <filter
+                    string="Accepted"
+                    name="accepted_recommendations"
+                    domain="[('state', '=', 'accepted')]"
+                />
+
+                <filter
+                    string="Budget"
+                    name="budget_recommendations"
+                    domain="[('recommendation_type', '=', 'budget')]"
+                />
+
+                <group expand="0" string="Group By">
+                    <filter
+                        string="Trip"
+                        name="group_by_trip"
+                        context="{'group_by': 'trip_id'}"
+                    />
+
+                    <filter
+                        string="Type"
+                        name="group_by_type"
+                        context="{'group_by': 'recommendation_type'}"
+                    />
+
+                    <filter
+                        string="Status"
+                        name="group_by_state"
+                        context="{'group_by': 'state'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
