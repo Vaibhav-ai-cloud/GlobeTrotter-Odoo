@@ -92,7 +92,7 @@ class GlobeTrotterExpense(models.Model):
                 raise ValidationError(
                     "The selected budget must belong to the same trip."
                 )
-                
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
