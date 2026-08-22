@@ -62,11 +62,36 @@
 
                     <separator string="Actual Spending"/>
 
+                    <separator string="Planned vs Actual Breakdown"/>
+
+                    <group>
+                        <group string="Planned">
+                            <field name="transport_budget" readonly="True"/>
+                            <field name="accommodation_budget" readonly="True"/>
+                            <field name="food_budget" readonly="True"/>
+                            <field name="activity_budget" readonly="True"/>
+                            <field name="other_budget" readonly="True"/>
+                        </group>
+
+                        <group string="Actual">
+                            <field name="actual_transport" readonly="True"/>
+                            <field name="actual_accommodation" readonly="True"/>
+                            <field name="actual_food" readonly="True"/>
+                            <field name="actual_activity" readonly="True"/>
+                            <field name="actual_other" readonly="True"/>
+                        </group>
+                    </group>
+
                     <group>
                         <group>
                             <field name="actual_spent" readonly="True"/>
                             <field name="actual_remaining" readonly="True"/>
                         </group>
+
+                        <field name="actual_transport" optional="hide"/>
+                        <field name="actual_accommodation" optional="hide"/>
+                        <field name="actual_food" optional="hide"/>
+                        <field name="actual_activity" optional="hide"/>
 
                         <group>
                             <field name="actual_usage" readonly="True"/>

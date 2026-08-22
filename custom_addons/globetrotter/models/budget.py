@@ -121,26 +121,94 @@ class GlobeTrotterBudget(models.Model):
         compute="_compute_actual_expenses",
         store=True,
     )
+    actual_transport = fields.Monetary(
+        string="Actual Transport",
+        currency_field="currency_id",
+        compute="_compute_actual_expenses",
+        store=True,
+    )
+
+    actual_accommodation = fields.Monetary(
+        string="Actual Stay",
+        currency_field="currency_id",
+        compute="_compute_actual_expenses",
+        store=True,
+    )
+
+    actual_food = fields.Monetary(
+        string="Actual Food",
+        currency_field="currency_id",
+        compute="_compute_actual_expenses",
+        store=True,
+    )
+
+    actual_activity = fields.Monetary(
+        string="Actual Activities",
+        currency_field="currency_id",
+        compute="_compute_actual_expenses",
+        store=True,
+    )
+
+    actual_other = fields.Monetary(
+        string="Actual Other",
+        currency_field="currency_id",
+        compute="_compute_actual_expenses",
+        store=True,
+    )
     
-    @api.depends("expense_ids.amount", "total_budget")
-    def _compute_actual_expenses(self):
-        for record in self:
-            record.actual_spent = sum(record.expense_ids.mapped("amount"))
+    @api.depends(
+    "expense_ids.amount",
+    "expense_ids.category",
+    "total_budget",
+)
+def _compute_actual_expenses(self):
+    for record in self:
+        transport = 0.0
+        accommodation = 0.0
+        food = 0.0
+        activity = 0.0
+        other = 0.0
 
-            record.actual_remaining = (
-                record.total_budget - record.actual_spent
-            )
-
-            record.is_actual_over_budget = (
-                record.actual_spent > record.total_budget
-            )
-
-            if record.total_budget > 0:
-                record.actual_usage = (
-                    record.actual_spent / record.total_budget
-                ) * 100
+        for expense in record.expense_ids:
+            if expense.category == "transport":
+                transport += expense.amount
+            elif expense.category == "accommodation":
+                accommodation += expense.amount
+            elif expense.category == "food":
+                food += expense.amount
+            elif expense.category == "activity":
+                activity += expense.amount
             else:
-                record.actual_usage = 0.0
+                other += expense.amount
+
+        record.actual_transport = transport
+        record.actual_accommodation = accommodation
+        record.actual_food = food
+        record.actual_activity = activity
+        record.actual_other = other
+
+        record.actual_spent = (
+            transport
+            + accommodation
+            + food
+            + activity
+            + other
+        )
+
+        record.actual_remaining = (
+            record.total_budget - record.actual_spent
+        )
+
+        record.is_actual_over_budget = (
+            record.actual_spent > record.total_budget
+        )
+
+        if record.total_budget > 0:
+            record.actual_usage = (
+                record.actual_spent / record.total_budget
+            ) * 100
+        else:
+            record.actual_usage = 0.0
 
     @api.depends(
         "total_budget",

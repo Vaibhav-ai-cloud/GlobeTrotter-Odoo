@@ -219,6 +219,61 @@ class GlobeTrotterRecommendation(models.Model):
                     "score": 90.0,
                 }
             )
+            
+        category_checks = [
+            (
+                "transport",
+                budget.transport_budget,
+                budget.actual_transport,
+            ),
+            (
+                "stay",
+                budget.accommodation_budget,
+                budget.actual_accommodation,
+            ),
+            (
+                "food",
+                budget.food_budget,
+                budget.actual_food,
+            ),
+            (
+                "activities",
+                budget.activity_budget,
+                budget.actual_activity,
+            ),
+            (
+                "other",
+                budget.other_budget,
+                budget.actual_other,
+            ),
+        ]
+
+        for category_name, planned_amount, actual_amount in category_checks:
+            if planned_amount <= 0:
+                continue
+
+            if actual_amount > planned_amount:
+                overspent = actual_amount - planned_amount
+                overspend_percent = (overspent / planned_amount) * 100
+
+                if overspend_percent >= 10:
+                    recommendations |= self.create(
+                        {
+                            "name": f"{category_name.title()} spending is high",
+                            "trip_id": trip_id,
+                            "budget_id": budget.id,
+                            "recommendation_type": "budget",
+                            "message": (
+                                f"Actual {category_name} spending is "
+                                f"{overspend_percent:.1f}% above the planned amount. "
+                                f"Review upcoming {category_name} expenses and "
+                                f"consider lower-cost alternatives."
+                            ),
+                            "estimated_saving": overspent,
+                            "currency_id": budget.currency_id.id,
+                            "score": 80.0,
+                        }
+                    )
 
         # Identify the largest planned cost category.
         category_amounts = {
