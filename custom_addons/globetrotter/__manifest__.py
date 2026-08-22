@@ -29,6 +29,8 @@ Core functionality:
         "views/trip_views.xml",
         "views/trip_stop_views.xml",
         "views/city_views.xml",
+        "views/activity_views.xml",
+        "views/itinerary_views.xml",
         "views/budget_views.xml",
         "views/expense_views.xml",
         "views/recommendation_views.xml",

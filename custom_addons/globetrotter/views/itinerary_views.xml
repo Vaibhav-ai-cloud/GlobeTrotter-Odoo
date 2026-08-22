@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_globetrotter_itinerary_list" model="ir.ui.view">
+        <field name="name">globetrotter.itinerary.list</field>
+        <field name="model">globetrotter.itinerary</field>
+        <field name="arch" type="xml">
+            <list string="Itineraries">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="activity_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="status"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_globetrotter_itinerary_form" model="ir.ui.view">
+        <field name="name">globetrotter.itinerary.form</field>
+        <field name="model">globetrotter.itinerary</field>
+        <field name="arch" type="xml">
+            <form string="Itinerary">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Itinerary Title"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Schedule">
+                            <field name="activity_id"/>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="sequence"/>
+                        </group>
+
+                        <group string="Status">
+                            <field name="status"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+
+                    <group string="Notes">
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_globetrotter_itinerary_search" model="ir.ui.view">
+        <field name="name">globetrotter.itinerary.search</field>
+        <field name="model">globetrotter.itinerary</field>
+        <field name="arch" type="xml">
+            <search string="Search Itineraries">
+                <field name="name"/>
+                <field name="activity_id"/>
+                <field name="status"/>
+
+                <filter
+                    name="active"
+                    string="Active"
+                    domain="[('active', '=', True)]"
+                />
+
+                <filter
+                        name="group_by_activity"
+                        string="Activity"
+                        context="{'group_by': 'activity_id'}"
+                />
+                <filter
+                        name="group_by_status"
+                        string="Status"
+                        context="{'group_by': 'status'}"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_globetrotter_itinerary" model="ir.actions.act_window">
+        <field name="name">Itineraries</field>
+        <field name="res_model">globetrotter.itinerary</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_globetrotter_itinerary_search"/>
+    </record>
+
+</odoo>

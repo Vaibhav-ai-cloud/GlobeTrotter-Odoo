@@ -50,6 +50,7 @@
 				<field name="name"/>
 				<field name="country_id"/>
 				<filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                        <filter name="group_by_country" string="Country" context="{'group_by': 'country_id'}"/>
 			</search>
 		</field>
 	</record>

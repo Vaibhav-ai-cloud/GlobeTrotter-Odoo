@@ -134,4 +134,10 @@
             </search>
         </field>
     </record>
+    <record id="action_globetrotter_recommendation" model="ir.actions.act_window">
+        <field name="name">Recommendations</field>
+        <field name="res_model">globetrotter.recommendation</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_globetrotter_recommendation_search"/>
+    </record>
 </odoo>

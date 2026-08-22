@@ -7,3 +7,5 @@ from . import budget
 from . import expense
 from . import recommendation
 from . import user_preference
+from . import activity
+from . import itinerary

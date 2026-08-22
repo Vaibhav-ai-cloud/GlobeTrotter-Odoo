@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_globetrotter_activity_list" model="ir.ui.view">
+        <field name="name">globetrotter.activity.list</field>
+        <field name="model">globetrotter.activity</field>
+        <field name="arch" type="xml">
+            <list string="Activities">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="city_id"/>
+                <field name="category"/>
+                <field name="duration"/>
+                <field name="estimated_cost"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="popularity"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_globetrotter_activity_form" model="ir.ui.view">
+        <field name="name">globetrotter.activity.form</field>
+        <field name="model">globetrotter.activity</field>
+        <field name="arch" type="xml">
+            <form string="Activity">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Activity Name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Basic Information">
+                            <field name="city_id"/>
+                            <field name="category"/>
+                            <field name="duration"/>
+                            <field name="sequence"/>
+                        </group>
+
+                        <group string="Cost &amp; Popularity">
+                            <field name="estimated_cost"/>
+                            <field name="currency_id"/>
+                            <field name="popularity"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+
+                    <group string="Location">
+                        <field name="latitude"/>
+                        <field name="longitude"/>
+                    </group>
+
+                    <group string="Description">
+                        <field name="description"/>
+                    </group>
+
+                    <group string="Image">
+                        <field name="image_1920" widget="image"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_globetrotter_activity_search" model="ir.ui.view">
+        <field name="name">globetrotter.activity.search</field>
+        <field name="model">globetrotter.activity</field>
+        <field name="arch" type="xml">
+            <search string="Search Activities">
+                <field name="name"/>
+                <field name="city_id"/>
+                <field name="category"/>
+
+                <filter
+                    name="active"
+                    string="Active"
+                    domain="[('active', '=', True)]"
+                />
+
+                <filter
+                        name="group_by_city"
+                        string="City"
+                        context="{'group_by': 'city_id'}"
+                />
+                <filter
+                        name="group_by_category"
+                        string="Category"
+                        context="{'group_by': 'category'}"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_globetrotter_activity" model="ir.actions.act_window">
+        <field name="name">Activities</field>
+        <field name="res_model">globetrotter.activity</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_globetrotter_activity_search"/>
+    </record>
+
+</odoo>
