@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:17
+    container_name: globetrotter-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - globetrotter-db-data:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:19
+    container_name: globetrotter-odoo
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: db
+      PORT: 5432
+      USER: ${POSTGRES_USER}
+      PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - globetrotter-odoo-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./custom_addons:/mnt/extra-addons
+
+volumes:
+  globetrotter-db-data:
+  globetrotter-odoo-data:

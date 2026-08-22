@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_globetrotter_trip_user" model="ir.rule">
+        <field name="name">GlobeTrotter Trip: User Own Trips</field>
+        <field name="model_id" ref="model_globetrotter_trip"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_user'))]"/>
+    </record>
+
+    <record id="rule_globetrotter_trip_manager" model="ir.rule">
+        <field name="name">GlobeTrotter Trip: Manager All Trips</field>
+        <field name="model_id" ref="model_globetrotter_trip"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_manager'))]"/>
+    </record>
+
+    <record id="rule_globetrotter_trip_stop_user" model="ir.rule">
+        <field name="name">GlobeTrotter Trip Stop: User Own Trips</field>
+        <field name="model_id" ref="model_globetrotter_trip_stop"/>
+        <field name="domain_force">[('trip_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_user'))]"/>
+    </record>
+
+    <record id="rule_globetrotter_trip_stop_manager" model="ir.rule">
+        <field name="name">GlobeTrotter Trip Stop: Manager All Stops</field>
+        <field name="model_id" ref="model_globetrotter_trip_stop"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_manager'))]"/>
+    </record>
+
+    <record id="rule_globetrotter_city_user" model="ir.rule">
+        <field name="name">GlobeTrotter City: User Access</field>
+        <field name="model_id" ref="model_globetrotter_city"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_user'))]"/>
+    </record>
+
+    <record id="rule_globetrotter_city_manager" model="ir.rule">
+        <field name="name">GlobeTrotter City: Manager Access</field>
+        <field name="model_id" ref="model_globetrotter_city"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_manager'))]"/>
+    </record>
+
+    <record id="rule_globetrotter_profile_user" model="ir.rule">
+        <field name="name">GlobeTrotter Profile: Own Profile</field>
+        <field name="model_id" ref="model_globetrotter_profile"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_user'))]"/>
+    </record>
+
+    <record id="rule_globetrotter_profile_manager" model="ir.rule">
+        <field name="name">GlobeTrotter Profile: Manager Access</field>
+        <field name="model_id" ref="model_globetrotter_profile"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('globetrotter.group_globetrotter_manager'))]"/>
+    </record>
+</odoo>

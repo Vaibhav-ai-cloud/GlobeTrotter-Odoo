@@ -89,13 +89,13 @@ class GlobeTrotterBudget(models.Model):
         compute="_compute_budget_summary",
         store=True,
     )
-    
+
     expense_ids = fields.One2many(
         "globetrotter.expense",
         "budget_id",
         string="Expenses",
     )
-    
+
     actual_spent = fields.Monetary(
         string="Actual Spent",
         currency_field="currency_id",
@@ -121,6 +121,7 @@ class GlobeTrotterBudget(models.Model):
         compute="_compute_actual_expenses",
         store=True,
     )
+
     actual_transport = fields.Monetary(
         string="Actual Transport",
         currency_field="currency_id",
@@ -155,60 +156,65 @@ class GlobeTrotterBudget(models.Model):
         compute="_compute_actual_expenses",
         store=True,
     )
-    
+
     @api.depends(
-    "expense_ids.amount",
-    "expense_ids.category",
-    "total_budget",
-)
-def _compute_actual_expenses(self):
-    for record in self:
-        transport = 0.0
-        accommodation = 0.0
-        food = 0.0
-        activity = 0.0
-        other = 0.0
+        "expense_ids.amount",
+        "expense_ids.category",
+        "expense_ids.is_planned",
+        "total_budget",
+    )
+    def _compute_actual_expenses(self):
+        for record in self:
+            transport = 0.0
+            accommodation = 0.0
+            food = 0.0
+            activity = 0.0
+            other = 0.0
 
-        for expense in record.expense_ids:
-            if expense.category == "transport":
-                transport += expense.amount
-            elif expense.category == "accommodation":
-                accommodation += expense.amount
-            elif expense.category == "food":
-                food += expense.amount
-            elif expense.category == "activity":
-                activity += expense.amount
+            actual_expenses = record.expense_ids.filtered(
+                lambda expense: not expense.is_planned
+            )
+
+            for expense in actual_expenses:
+                if expense.category == "transport":
+                    transport += expense.amount
+                elif expense.category == "accommodation":
+                    accommodation += expense.amount
+                elif expense.category == "food":
+                    food += expense.amount
+                elif expense.category == "activity":
+                    activity += expense.amount
+                else:
+                    other += expense.amount
+
+            record.actual_transport = transport
+            record.actual_accommodation = accommodation
+            record.actual_food = food
+            record.actual_activity = activity
+            record.actual_other = other
+
+            record.actual_spent = (
+                transport
+                + accommodation
+                + food
+                + activity
+                + other
+            )
+
+            record.actual_remaining = (
+                record.total_budget - record.actual_spent
+            )
+
+            record.is_actual_over_budget = (
+                record.actual_spent > record.total_budget
+            )
+
+            if record.total_budget > 0:
+                record.actual_usage = (
+                    record.actual_spent / record.total_budget
+                ) * 100
             else:
-                other += expense.amount
-
-        record.actual_transport = transport
-        record.actual_accommodation = accommodation
-        record.actual_food = food
-        record.actual_activity = activity
-        record.actual_other = other
-
-        record.actual_spent = (
-            transport
-            + accommodation
-            + food
-            + activity
-            + other
-        )
-
-        record.actual_remaining = (
-            record.total_budget - record.actual_spent
-        )
-
-        record.is_actual_over_budget = (
-            record.actual_spent > record.total_budget
-        )
-
-        if record.total_budget > 0:
-            record.actual_usage = (
-                record.actual_spent / record.total_budget
-            ) * 100
-        else:
-            record.actual_usage = 0.0
+                record.actual_usage = 0.0
 
     @api.depends(
         "total_budget",

@@ -1,0 +1,381 @@
+// ─── GlobeTrotter Dashboard — Premium SaaS Design ────────────────────────────
+// Design tokens
+$gt-bg:            #f0f4f8;
+$gt-surface:       #ffffff;
+$gt-border:        #e2eaee;
+$gt-border-hover:  #8eb8cc;
+$gt-text-primary:  #1a2b38;
+$gt-text-muted:    #5e7484;
+$gt-text-faint:    #94a8b5;
+$gt-accent:        #1a6fa8;        // deep ocean blue — primary CTA
+$gt-accent-light:  #e8f3fb;
+$gt-accent-dark:   #14578a;
+$gt-green:         #1e8c6a;        // confirmed / completed
+$gt-green-light:   #e6f7f2;
+$gt-amber:         #b46b0a;
+$gt-amber-light:   #fef3e2;
+$gt-red:           #c0392b;
+$gt-red-light:     #fdecea;
+$gt-grey:          #546e7a;
+$gt-grey-light:    #eceff1;
+
+// Shared transition
+$gt-ease: 0.18s ease;
+
+// ─── Root container ───────────────────────────────────────────────────────────
+.o_globetrotter_dashboard {
+    height: 100%;
+    min-height: 0;
+    padding: 2rem clamp(1rem, 4vw, 3.5rem) 3rem;
+    background: $gt-bg;
+    color: $gt-text-primary;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+.o_globetrotter_dashboard_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid $gt-border;
+}
+
+.o_globetrotter_eyebrow {
+    margin: 0 0 .3rem;
+    color: $gt-accent;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.o_globetrotter_dashboard h1 {
+    margin: 0 0 .25rem;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: $gt-text-primary;
+    letter-spacing: -.02em;
+    line-height: 1.15;
+}
+
+.o_globetrotter_subtitle {
+    margin: 0;
+    color: $gt-text-muted;
+    font-size: .88rem;
+}
+
+.o_globetrotter_dashboard h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $gt-text-primary;
+    letter-spacing: -.01em;
+}
+
+// ─── Metric grid ──────────────────────────────────────────────────────────────
+.o_globetrotter_metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .9rem;
+    max-width: 1200px;
+    margin: 0 auto 1rem;
+}
+
+.o_globetrotter_metric {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1.35rem 1.4rem 1.25rem;
+    background: $gt-surface;
+    border: 1px solid $gt-border;
+    border-radius: 12px;
+    color: $gt-text-primary;
+    text-align: left;
+    cursor: pointer;
+    transition: transform $gt-ease, box-shadow $gt-ease, border-color $gt-ease;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(26, 43, 56, .10);
+        border-color: $gt-border-hover;
+    }
+
+    .o_metric_icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: $gt-accent-light;
+        color: $gt-accent;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .o_metric_value {
+        font-size: 2.1rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -.03em;
+        color: $gt-text-primary;
+    }
+
+    .o_metric_label {
+        font-size: .78rem;
+        font-weight: 600;
+        color: $gt-text-muted;
+        letter-spacing: .01em;
+    }
+
+    // Primary accent card (Total Trips)
+    &.o_metric_primary {
+        background: linear-gradient(135deg, $gt-accent 0%, $gt-accent-dark 100%);
+        border-color: transparent;
+        color: #fff;
+
+        .o_metric_icon {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+        }
+
+        .o_metric_value { color: #fff; }
+        .o_metric_label { color: rgba(255,255,255,.75); }
+
+        &:hover {
+            box-shadow: 0 8px 28px rgba(26, 111, 168, .45);
+            border-color: transparent;
+        }
+    }
+}
+
+// ─── Two-column layout ────────────────────────────────────────────────────────
+.o_globetrotter_columns {
+    display: grid;
+    grid-template-columns: minmax(240px, .75fr) minmax(320px, 1.25fr);
+    gap: .9rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+// ─── Panels ───────────────────────────────────────────────────────────────────
+.o_globetrotter_panel {
+    background: $gt-surface;
+    border: 1px solid $gt-border;
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-width: 0;
+}
+
+.o_panel_heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .btn-link {
+        padding: 0;
+        color: $gt-accent;
+        font-size: .8rem;
+        font-weight: 600;
+        white-space: nowrap;
+        text-decoration: none;
+
+        &:hover { color: $gt-accent-dark; text-decoration: underline; }
+    }
+}
+
+// ─── Status rows (Trip pipeline) ──────────────────────────────────────────────
+.o_status_rows {
+    border-top: 1px solid $gt-border;
+}
+
+.o_status_row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: .85rem 0;
+    border: 0;
+    border-bottom: 1px solid $gt-border;
+    background: transparent;
+    color: $gt-text-primary;
+    text-align: left;
+    cursor: pointer;
+    transition: background $gt-ease;
+    gap: .75rem;
+    border-radius: 0;
+
+    &:hover {
+        background: $gt-accent-light;
+        padding-left: .6rem;
+        padding-right: .6rem;
+        margin-left: -.6rem;
+        margin-right: -.6rem;
+        border-radius: 6px;
+        border-bottom-color: transparent;
+    }
+
+    .o_status_row_label {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-size: .88rem;
+        color: $gt-text-muted;
+        font-weight: 500;
+    }
+
+    .o_status_dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    strong {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: $gt-text-primary;
+    }
+}
+
+// Status dot colours
+.o_dot_draft     { background: $gt-grey; }
+.o_dot_planned   { background: $gt-amber; }
+.o_dot_completed { background: $gt-green; }
+.o_dot_cancelled { background: $gt-red; }
+
+// ─── Recent trips ─────────────────────────────────────────────────────────────
+.o_recent_trips {
+    border-top: 1px solid $gt-border;
+}
+
+.o_recent_trip {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: .9rem;
+    padding: .9rem 0;
+    border: 0;
+    border-bottom: 1px solid $gt-border;
+    background: transparent;
+    color: $gt-text-primary;
+    text-align: left;
+    cursor: pointer;
+    transition: background $gt-ease;
+
+    &:hover {
+        background: $gt-accent-light;
+        padding-left: .6rem;
+        padding-right: .6rem;
+        margin-left: -.6rem;
+        margin-right: -.6rem;
+        border-radius: 6px;
+        border-bottom-color: transparent;
+    }
+
+    &:last-child { border-bottom: 0; }
+}
+
+.o_trip_avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: $gt-accent-light;
+    color: $gt-accent;
+    font-size: .9rem;
+    flex-shrink: 0;
+}
+
+.o_trip_details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: .18rem;
+    min-width: 0;
+
+    strong {
+        font-size: .93rem;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    small {
+        font-size: .76rem;
+        color: $gt-text-faint;
+    }
+}
+
+.o_trip_meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .25rem;
+    flex-shrink: 0;
+
+    small {
+        font-size: .74rem;
+        color: $gt-text-faint;
+    }
+}
+
+// ─── Status badges ────────────────────────────────────────────────────────────
+.o_trip_state {
+    display: inline-block;
+    padding: .22rem .6rem;
+    border-radius: 20px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+
+.o_state_draft     { background: $gt-grey-light;  color: $gt-grey; }
+.o_state_planned   { background: $gt-amber-light; color: $gt-amber; }
+.o_state_completed { background: $gt-green-light; color: $gt-green; }
+.o_state_cancelled { background: $gt-red-light;   color: $gt-red; }
+
+// ─── Loading / empty ──────────────────────────────────────────────────────────
+.o_globetrotter_loading,
+.o_empty_state {
+    padding: 2.5rem 0;
+    text-align: center;
+    color: $gt-text-faint;
+    font-size: .9rem;
+}
+
+.o_empty_state i {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: .75rem;
+    color: $gt-border;
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 960px) {
+    .o_globetrotter_metrics  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .o_globetrotter_columns  { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 540px) {
+    .o_globetrotter_dashboard        { padding: 1.25rem 1rem 2rem; }
+    .o_globetrotter_dashboard_header { flex-direction: column; align-items: flex-start; }
+    .o_globetrotter_dashboard_header .btn { width: 100%; }
+    .o_globetrotter_metrics          { grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .o_globetrotter_metric           { padding: 1rem; }
+    .o_metric_value                  { font-size: 1.7rem; }
+}

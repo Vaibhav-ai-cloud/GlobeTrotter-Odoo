@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ── List View ── -->
     <record id="view_globetrotter_budget_list" model="ir.ui.view">
         <field name="name">globetrotter.budget.list</field>
         <field name="model">globetrotter.budget</field>
         <field name="arch" type="xml">
-            <list string="Trip Budgets">
+            <list string="Trip Budgets"
+                  decoration-danger="is_actual_over_budget == True"
+                  decoration-warning="is_over_budget == True and is_actual_over_budget == False">
                 <field name="name"/>
                 <field name="trip_id"/>
-                <field name="total_budget"/>
-                <field name="planned_total"/>
-                <field name="actual_spent"/>
-                <field name="actual_remaining"/>
-                <field name="actual_usage"/>
-                <field name="is_actual_over_budget"/>
                 <field name="currency_id" column_invisible="True"/>
+                <field name="total_budget"/>
+                <field name="planned_total" string="Planned"/>
+                <field name="actual_spent" string="Spent"/>
+                <field name="actual_remaining" string="Remaining"/>
+                <field name="actual_usage" string="Used %"/>
+                <field name="is_actual_over_budget" string="Over Budget"/>
             </list>
         </field>
     </record>
 
+    <!-- ── Form View ── -->
     <record id="view_globetrotter_budget_form" model="ir.ui.view">
         <field name="name">globetrotter.budget.form</field>
         <field name="model">globetrotter.budget</field>
@@ -25,89 +29,84 @@
             <form string="Trip Budget">
                 <sheet>
                     <div class="oe_title">
+                        <label for="name"/>
                         <h1>
                             <field name="name" placeholder="Trip Budget"/>
                         </h1>
                     </div>
 
+                    <!-- ── Trip &amp; Summary ── -->
                     <group>
-                        <group string="Trip">
+                        <group string="Trip Details">
                             <field name="trip_id"/>
                             <field name="currency_id"/>
                             <field name="total_budget"/>
                         </group>
 
                         <group string="Budget Status">
-                            <field name="planned_total" readonly="True"/>
-                            <field name="remaining_budget" readonly="True"/>
-                            <field name="budget_usage" readonly="True"/>
-                            <field name="is_over_budget" readonly="True"/>
+                            <field name="planned_total" readonly="True" string="Planned Total"/>
+                            <field name="remaining_budget" readonly="True" string="Unallocated"/>
+                            <field name="budget_usage" readonly="True" string="Allocation %"/>
+                            <field name="is_over_budget" readonly="True" string="Planned Over Budget"/>
                         </group>
                     </group>
 
-                    <separator string="Planned Category Budget"/>
-
+                    <!-- ── Category Budgets ── -->
+                    <separator string="Category Budget Allocation"/>
                     <group>
                         <group>
-                            <field name="transport_budget"/>
-                            <field name="accommodation_budget"/>
-                            <field name="food_budget"/>
+                            <field name="transport_budget" string="Transport"/>
+                            <field name="accommodation_budget" string="Accommodation"/>
+                            <field name="food_budget" string="Food &amp; Dining"/>
                         </group>
-
                         <group>
-                            <field name="activity_budget"/>
-                            <field name="other_budget"/>
+                            <field name="activity_budget" string="Activities"/>
+                            <field name="other_budget" string="Other"/>
                         </group>
                     </group>
 
-                    <separator string="Actual Spending"/>
-
-                    <separator string="Planned vs Actual Breakdown"/>
-
+                    <!-- ── Actual vs Planned Breakdown ── -->
+                    <separator string="Planned vs Actual Spending"/>
                     <group>
                         <group string="Planned">
-                            <field name="transport_budget" readonly="True"/>
-                            <field name="accommodation_budget" readonly="True"/>
-                            <field name="food_budget" readonly="True"/>
-                            <field name="activity_budget" readonly="True"/>
-                            <field name="other_budget" readonly="True"/>
+                            <field name="transport_budget"      readonly="True" string="Transport"/>
+                            <field name="accommodation_budget"  readonly="True" string="Accommodation"/>
+                            <field name="food_budget"           readonly="True" string="Food &amp; Dining"/>
+                            <field name="activity_budget"       readonly="True" string="Activities"/>
+                            <field name="other_budget"          readonly="True" string="Other"/>
                         </group>
-
                         <group string="Actual">
-                            <field name="actual_transport" readonly="True"/>
-                            <field name="actual_accommodation" readonly="True"/>
-                            <field name="actual_food" readonly="True"/>
-                            <field name="actual_activity" readonly="True"/>
-                            <field name="actual_other" readonly="True"/>
+                            <field name="actual_transport"      readonly="True" string="Transport"/>
+                            <field name="actual_accommodation"  readonly="True" string="Accommodation"/>
+                            <field name="actual_food"           readonly="True" string="Food &amp; Dining"/>
+                            <field name="actual_activity"       readonly="True" string="Activities"/>
+                            <field name="actual_other"          readonly="True" string="Other"/>
                         </group>
                     </group>
 
+                    <!-- ── Actual Summary ── -->
+                    <separator string="Actual Summary"/>
                     <group>
                         <group>
-                            <field name="actual_spent" readonly="True"/>
-                            <field name="actual_remaining" readonly="True"/>
+                            <field name="actual_spent"      readonly="True" string="Total Spent"/>
+                            <field name="actual_remaining"  readonly="True" string="Remaining Budget"/>
                         </group>
-
-                        <field name="actual_transport" optional="hide"/>
-                        <field name="actual_accommodation" optional="hide"/>
-                        <field name="actual_food" optional="hide"/>
-                        <field name="actual_activity" optional="hide"/>
-
                         <group>
-                            <field name="actual_usage" readonly="True"/>
-                            <field name="is_actual_over_budget" readonly="True"/>
+                            <field name="actual_usage"          readonly="True" string="Budget Used (%)"/>
+                            <field name="is_actual_over_budget" readonly="True" string="Over Budget"/>
                         </group>
                     </group>
 
+                    <!-- ── Expenses ── -->
                     <notebook>
-                        <page string="Expenses">
+                        <page string="Expenses" name="expenses">
                             <field name="expense_ids">
-                                <list editable="bottom">
-                                    <field name="expense_date"/>
-                                    <field name="name"/>
-                                    <field name="category"/>
+                                <list editable="bottom" default_order="expense_date desc">
+                                    <field name="expense_date" string="Date"/>
+                                    <field name="name" string="Description"/>
+                                    <field name="category" string="Category"/>
                                     <field name="amount"/>
-                                    <field name="is_planned"/>
+                                    <field name="is_planned" string="Planned?"/>
                                     <field name="currency_id" column_invisible="True"/>
                                 </list>
                             </field>
@@ -118,6 +117,7 @@
         </field>
     </record>
 
+    <!-- ── Search View ── -->
     <record id="view_globetrotter_budget_search" model="ir.ui.view">
         <field name="name">globetrotter.budget.search</field>
         <field name="model">globetrotter.budget</field>
@@ -126,26 +126,22 @@
                 <field name="name"/>
                 <field name="trip_id"/>
 
-                <filter
-                    string="Over Budget"
-                    name="over_budget"
-                    domain="[('is_actual_over_budget', '=', True)]"
-                />
+                <filter string="Over Budget (Actual)"  name="over_budget"
+                        domain="[('is_actual_over_budget', '=', True)]"/>
+                <filter string="Over Budget (Planned)" name="planned_over_budget"
+                        domain="[('is_over_budget', '=', True)]"/>
 
-                <filter
-                    string="Planned Over Budget"
-                    name="planned_over_budget"
-                    domain="[('is_over_budget', '=', True)]"
-                />
-
-                <group expand="0" string="Group By">
-                    <filter
-                        string="Trip"
-                        name="group_by_trip"
-                        context="{'group_by': 'trip_id'}"
-                    />
-                </group>
+                <separator/>
+                <filter string="By Trip" name="group_by_trip"
+                        context="{'group_by': 'trip_id'}"/>
             </search>
         </field>
+    </record>
+
+    <record id="action_globetrotter_budget" model="ir.actions.act_window">
+        <field name="name">Trip Budgets</field>
+        <field name="res_model">globetrotter.budget</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_globetrotter_budget_search"/>
     </record>
 </odoo>

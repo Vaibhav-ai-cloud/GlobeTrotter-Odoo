@@ -1,3 +1,5 @@
+"""GlobeTrotter city model."""
+
 from odoo import fields, models
 
 

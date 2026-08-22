@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="city_ahmedabad" model="globetrotter.city">
+        <field name="name">Ahmedabad</field>
+        <field name="country_id" ref="base.in"/>
+        <field name="description">Major city in Gujarat, India.</field>
+        <field name="latitude">23.0225</field>
+        <field name="longitude">72.5714</field>
+        <field name="popularity">90</field>
+        <field name="cost_index">45.0</field>
+    </record>
+
+    <record id="city_mumbai" model="globetrotter.city">
+        <field name="name">Mumbai</field>
+        <field name="country_id" ref="base.in"/>
+        <field name="description">Major coastal city in Maharashtra, India.</field>
+        <field name="latitude">19.0760</field>
+        <field name="longitude">72.8777</field>
+        <field name="popularity">95</field>
+        <field name="cost_index">75.0</field>
+    </record>
+
+    <record id="city_delhi" model="globetrotter.city">
+        <field name="name">Delhi</field>
+        <field name="country_id" ref="base.in"/>
+        <field name="description">Capital territory of India with historic landmarks.</field>
+        <field name="latitude">28.6139</field>
+        <field name="longitude">77.2090</field>
+        <field name="popularity">95</field>
+        <field name="cost_index">60.0</field>
+    </record>
+</odoo>
