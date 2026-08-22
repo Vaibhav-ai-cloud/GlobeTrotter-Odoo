@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_globetrotter_city_user,globetrotter.city.user,model_globetrotter_city,globetrotter.group_globetrotter_user,1,1,1,0
+access_globetrotter_city_manager,globetrotter.city.manager,model_globetrotter_city,globetrotter.group_globetrotter_manager,1,1,1,1
+access_globetrotter_trip_user,globetrotter.trip.user,model_globetrotter_trip,globetrotter.group_globetrotter_user,1,1,1,0
+access_globetrotter_trip_manager,globetrotter.trip.manager,model_globetrotter_trip,globetrotter.group_globetrotter_manager,1,1,1,1
+access_globetrotter_trip_stop_user,globetrotter.trip.stop.user,model_globetrotter_trip_stop,globetrotter.group_globetrotter_user,1,1,1,0
+access_globetrotter_trip_stop_manager,globetrotter.trip.stop.manager,model_globetrotter_trip_stop,globetrotter.group_globetrotter_manager,1,1,1,1

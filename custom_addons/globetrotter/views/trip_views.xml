@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="view_globetrotter_trip_list" model="ir.ui.view">
+		<field name="name">globetrotter.trip.list</field>
+		<field name="model">globetrotter.trip</field>
+		<field name="arch" type="xml">
+			<list string="Trips">
+				<field name="name"/>
+				<field name="user_id"/>
+				<field name="start_date"/>
+				<field name="end_date"/>
+				<field name="stop_count"/>
+				<field name="state"/>
+			</list>
+		</field>
+	</record>
+
+	<record id="view_globetrotter_trip_form" model="ir.ui.view">
+		<field name="name">globetrotter.trip.form</field>
+		<field name="model">globetrotter.trip</field>
+		<field name="arch" type="xml">
+			<form string="Trip">
+				<header>
+					<field name="state" widget="statusbar" statusbar_visible="draft,planned,completed,cancelled"/>
+				</header>
+				<sheet>
+					<group>
+						<group>
+							<field name="name"/>
+							<field name="user_id"/>
+						</group>
+						<group>
+							<field name="start_date"/>
+							<field name="end_date"/>
+							<field name="stop_count" readonly="1"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Stops">
+							<field name="stop_ids">
+								<list editable="bottom">
+									<field name="sequence" widget="handle"/>
+									<field name="city_id"/>
+									<field name="arrival_date"/>
+									<field name="departure_date"/>
+									<field name="duration" readonly="1"/>
+									<field name="notes"/>
+								</list>
+							</field>
+						</page>
+						<page string="Description">
+							<field name="description" placeholder="Describe the trip..."/>
+						</page>
+					</notebook>
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+	<record id="view_globetrotter_trip_search" model="ir.ui.view">
+		<field name="name">globetrotter.trip.search</field>
+		<field name="model">globetrotter.trip</field>
+		<field name="arch" type="xml">
+			<search string="Search Trips">
+				<field name="name"/>
+				<field name="user_id"/>
+				<field name="state"/>
+				<filter name="my_trips" string="My Trips" domain="[('user_id', '=', uid)]"/>
+			</search>
+		</field>
+	</record>
+
+	<record id="action_globetrotter_trip" model="ir.actions.act_window">
+		<field name="name">Trips</field>
+		<field name="res_model">globetrotter.trip</field>
+		<field name="view_mode">list,form</field>
+		<field name="search_view_id" ref="view_globetrotter_trip_search"/>
+	</record>
+</odoo>
