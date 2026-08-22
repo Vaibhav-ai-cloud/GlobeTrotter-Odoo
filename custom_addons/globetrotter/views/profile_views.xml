@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── List View ── -->
+    <record id="view_globetrotter_profile_list" model="ir.ui.view">
+        <field name="name">globetrotter.profile.list</field>
+        <field name="model">globetrotter.profile</field>
+        <field name="arch" type="xml">
+            <list string="Profiles">
+                <field name="profile_name" string="Profile Name"/>
+                <field name="user_id"      string="Account"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form View ── -->
+    <record id="view_globetrotter_profile_form" model="ir.ui.view">
+        <field name="name">globetrotter.profile.form</field>
+        <field name="model">globetrotter.profile</field>
+        <field name="arch" type="xml">
+            <form string="My Profile">
+                <sheet>
+                    <!-- Profile image (avatar) -->
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="profile_name" string="Profile Name"/>
+                        <h1>
+                            <field name="profile_name" placeholder="Your display name"/>
+                        </h1>
+                    </div>
+
+                    <group string="Account">
+                        <field name="user_id" readonly="1" string="Linked Account"/>
+                    </group>
+
+                    <separator string="About Me"/>
+                    <group>
+                        <field name="bio" nolabel="1"
+                               placeholder="Tell us about yourself — your travel style, favourite destinations, dream trips…"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Search View ── -->
+    <record id="view_globetrotter_profile_search" model="ir.ui.view">
+        <field name="name">globetrotter.profile.search</field>
+        <field name="model">globetrotter.profile</field>
+        <field name="arch" type="xml">
+            <search string="Search Profiles">
+                <field name="profile_name"/>
+                <field name="user_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_globetrotter_profile" model="ir.actions.act_window">
+        <field name="name">Profile</field>
+        <field name="res_model">globetrotter.profile</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_globetrotter_profile_search"/>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="context">{'default_user_id': uid}</field>
+    </record>
+</odoo>

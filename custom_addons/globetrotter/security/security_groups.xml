@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_globetrotter_user" model="res.groups">
+        <field name="name">GlobeTrotter User</field>
+    </record>
+
+    <record id="group_globetrotter_manager" model="res.groups">
+        <field name="name">GlobeTrotter Manager</field>
+        <field name="implied_ids" eval="[(4, ref('globetrotter.group_globetrotter_user'))]"/>
+    </record>
+</odoo>

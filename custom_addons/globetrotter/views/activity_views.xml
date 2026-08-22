@@ -83,20 +83,25 @@
                     domain="[('active', '=', True)]"
                 />
 
-                <group expand="0" string="Group By">
-                    <filter
+                <filter
                         name="group_by_city"
                         string="City"
                         context="{'group_by': 'city_id'}"
-                    />
-                    <filter
+                />
+                <filter
                         name="group_by_category"
                         string="Category"
                         context="{'group_by': 'category'}"
-                    />
-                </group>
+                />
             </search>
         </field>
+    </record>
+
+    <record id="action_globetrotter_activity" model="ir.actions.act_window">
+        <field name="name">Activities</field>
+        <field name="res_model">globetrotter.activity</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_globetrotter_activity_search"/>
     </record>
 
 </odoo>
