@@ -1,4 +1,5 @@
 from odoo.tests.common import TransactionCase
+from odoo.exceptions import ValidationError
 
 
 class TestGlobeTrotterBudget(TransactionCase):
@@ -167,3 +168,200 @@ class TestGlobeTrotterBudget(TransactionCase):
                 for recommendation in recommendations
             )
         )
+
+
+        def test_negative_budget_not_allowed(self):
+            with self.assertRaises(ValidationError):
+                self.Budget.create(
+                    {
+                        "name": "Invalid Budget",
+                        "trip_id": self.trip.id,
+                        "total_budget": -1000.0,
+                    }
+                )
+
+
+        def test_zero_or_negative_expense_not_allowed(self):
+            with self.assertRaises(ValidationError):
+                self.Expense.create(
+                    {
+                        "name": "Invalid Expense",
+                        "trip_id": self.trip.id,
+                        "budget_id": self.budget.id,
+                        "category": "food",
+                        "amount": 0.0,
+                        "is_planned": False,
+                    }
+                )
+
+
+        def test_expense_inherits_budget_trip_and_currency(self):
+            expense = self.Expense.create(
+                {
+                    "name": "Taxi",
+                    "budget_id": self.budget.id,
+                    "category": "transport",
+                    "amount": 500.0,
+                    "is_planned": False,
+                }
+            )
+
+            self.assertEqual(
+                expense.trip_id,
+                self.budget.trip_id,
+            )
+
+            self.assertEqual(
+                expense.currency_id,
+                self.budget.currency_id,
+            )
+
+
+        def test_category_actual_breakdown(self):
+            self.Expense.create(
+                {
+                    "name": "Taxi",
+                    "budget_id": self.budget.id,
+                    "category": "transport",
+                    "amount": 1000.0,
+                    "is_planned": False,
+                }
+            )
+
+            self.Expense.create(
+                {
+                    "name": "Dinner",
+                    "budget_id": self.budget.id,
+                    "category": "food",
+                    "amount": 800.0,
+                    "is_planned": False,
+                }
+            )
+
+            self.Expense.create(
+                {
+                    "name": "Museum",
+                    "budget_id": self.budget.id,
+                    "category": "activity",
+                    "amount": 700.0,
+                    "is_planned": False,
+                }
+            )
+
+            self.budget.invalidate_recordset()
+
+            self.assertEqual(
+                self.budget.actual_transport,
+                1000.0,
+            )
+
+            self.assertEqual(
+                self.budget.actual_food,
+                800.0,
+            )
+
+            self.assertEqual(
+                self.budget.actual_activity,
+                700.0,
+            )
+
+            self.assertEqual(
+                self.budget.actual_spent,
+                2500.0,
+            )
+
+
+        def test_planned_expense_is_excluded_from_actual_totals(self):
+            self.Expense.create(
+                {
+                    "name": "Planned Hotel",
+                    "budget_id": self.budget.id,
+                    "category": "accommodation",
+                    "amount": 6000.0,
+                    "is_planned": True,
+                }
+            )
+
+            self.Expense.create(
+                {
+                    "name": "Paid Hotel",
+                    "budget_id": self.budget.id,
+                    "category": "accommodation",
+                    "amount": 5500.0,
+                    "is_planned": False,
+                }
+            )
+
+            self.budget.invalidate_recordset()
+
+            self.assertEqual(
+                self.budget.actual_accommodation,
+                5500.0,
+            )
+
+            self.assertEqual(
+                self.budget.actual_spent,
+                5500.0,
+            )
+
+
+        def test_category_overspend_recommendation(self):
+            self.Expense.create(
+                {
+                    "name": "Expensive Food",
+                    "budget_id": self.budget.id,
+                    "category": "food",
+                    "amount": 4500.0,
+                    "is_planned": False,
+                }
+            )
+
+            self.budget.invalidate_recordset()
+
+            recommendations = (
+                self.Recommendation
+                .generate_budget_recommendations(
+                    self.trip.id
+                )
+            )
+
+            food_recommendations = recommendations.filtered(
+                lambda rec: (
+                    rec.recommendation_type == "budget"
+                    and "Food spending is high" in rec.name
+                )
+            )
+
+            self.assertTrue(
+                food_recommendations,
+            )
+
+
+        def test_refresh_keeps_accepted_history(self):
+            recommendations = (
+                self.Recommendation
+                .generate_budget_recommendations(
+                    self.trip.id
+                )
+            )
+
+            if not recommendations:
+                self.skipTest(
+                    "No recommendation generated for this scenario."
+                )
+
+            recommendation = recommendations[0]
+            recommendation.action_accept()
+
+            self.Recommendation.generate_budget_recommendations(
+                self.trip.id
+            )
+
+            self.assertTrue(
+                recommendation.exists(),
+            )
+
+            self.assertEqual(
+                recommendation.state,
+                "accepted",
+            )
