@@ -1,0 +1,403 @@
+from odoo import api, fields, models
+
+
+class GlobeTrotterRecommendation(models.Model):
+    _name = "globetrotter.recommendation"
+    _description = "Trip Recommendation"
+    _order = "score desc, id desc"
+
+    name = fields.Char(
+        string="Recommendation",
+        required=True,
+    )
+
+    trip_id = fields.Many2one(
+        "globetrotter.trip",
+        string="Trip",
+        required=True,
+        ondelete="cascade",
+        index=True,
+    )
+
+    budget_id = fields.Many2one(
+        "globetrotter.budget",
+        string="Budget",
+        ondelete="cascade",
+        index=True,
+    )
+
+    recommendation_type = fields.Selection(
+        [
+            ("budget", "Budget Optimization"),
+            ("activity", "Activity Suggestion"),
+            ("schedule", "Schedule Improvement"),
+            ("general", "General"),
+        ],
+        string="Type",
+        required=True,
+        default="general",
+    )
+
+    message = fields.Text(
+        string="Recommendation Message",
+        required=True,
+    )
+
+    estimated_saving = fields.Monetary(
+        string="Estimated Saving",
+        currency_field="currency_id",
+        default=0.0,
+    )
+
+    currency_id = fields.Many2one(
+        "res.currency",
+        string="Currency",
+        required=True,
+        default=lambda self: self.env.company.currency_id,
+    )
+
+    score = fields.Float(
+        string="Priority Score",
+        default=0.0,
+        help="Higher score means a higher recommendation priority.",
+    )
+
+    state = fields.Selection(
+        [
+            ("new", "New"),
+            ("accepted", "Accepted"),
+            ("dismissed", "Dismissed"),
+        ],
+        string="Status",
+        default="new",
+        required=True,
+    )
+
+    active = fields.Boolean(
+        string="Active",
+        default=True,
+    )
+
+    def action_accept(self):
+        self.write({"state": "accepted"})
+        return True
+
+    def action_dismiss(self):
+        self.write({"state": "dismissed"})
+        return True
+
+    @api.model
+    def _get_current_user_preference(self):
+        return self.env["globetrotter.user.preference"].search(
+            [
+                ("user_id", "=", self.env.user.id),
+                ("active", "=", True),
+            ],
+            limit=1,
+        )
+
+    @api.model
+    def generate_budget_recommendations(self, trip_id):
+        """Generate smart budget recommendations for one trip."""
+
+        if not trip_id:
+            return self.browse()
+
+        Budget = self.env["globetrotter.budget"]
+
+        budget = Budget.search(
+            [("trip_id", "=", trip_id)],
+            order="id desc",
+            limit=1,
+        )
+
+        if not budget:
+            return self.browse()
+
+        preference = self._get_current_user_preference()
+
+        # Default recommendation sensitivity.
+        warning_threshold = 80.0
+        optimization_ratio = 0.40
+        saving_ratio = 0.10
+
+        # Personalize thresholds using the user's travel style.
+        if preference:
+            if preference.travel_style == "budget":
+                warning_threshold = 70.0
+                optimization_ratio = 0.30
+                saving_ratio = 0.15
+
+            elif preference.travel_style == "premium":
+                warning_threshold = 90.0
+                optimization_ratio = 0.50
+                saving_ratio = 0.05
+
+            if preference.prefers_low_cost:
+                warning_threshold = min(
+                    warning_threshold,
+                    70.0,
+                )
+                saving_ratio = max(
+                    saving_ratio,
+                    0.15,
+                )
+
+        # Remove previous NEW budget suggestions for this budget.
+        # Accepted/dismissed recommendation history is preserved.
+        old_recommendations = self.search(
+            [
+                ("trip_id", "=", trip_id),
+                ("budget_id", "=", budget.id),
+                ("recommendation_type", "=", "budget"),
+                ("state", "=", "new"),
+            ]
+        )
+
+        old_recommendations.unlink()
+
+        recommendations = self.browse()
+
+        # No total budget configured.
+        if budget.total_budget <= 0:
+            recommendations |= self.create(
+                {
+                    "name": "Set a trip budget",
+                    "trip_id": trip_id,
+                    "budget_id": budget.id,
+                    "recommendation_type": "budget",
+                    "message": (
+                        "Set a total trip budget to enable cost tracking "
+                        "and personalized budget recommendations."
+                    ),
+                    "currency_id": budget.currency_id.id,
+                    "score": 100.0,
+                }
+            )
+
+            return recommendations
+
+        # Actual trip spending exceeded total budget.
+        if budget.actual_spent > budget.total_budget:
+            exceeded_by = (
+                budget.actual_spent - budget.total_budget
+            )
+
+            recommendations |= self.create(
+                {
+                    "name": "Trip is over budget",
+                    "trip_id": trip_id,
+                    "budget_id": budget.id,
+                    "recommendation_type": "budget",
+                    "message": (
+                        "Your actual trip spending exceeds the "
+                        f"total budget by {exceeded_by:.2f}. "
+                        "Review high-cost categories before "
+                        "adding more expenses."
+                    ),
+                    "estimated_saving": exceeded_by,
+                    "currency_id": budget.currency_id.id,
+                    "score": 100.0,
+                }
+            )
+
+        # Spending is approaching total budget.
+        elif budget.actual_usage >= warning_threshold:
+            recommendations |= self.create(
+                {
+                    "name": "Budget usage is high",
+                    "trip_id": trip_id,
+                    "budget_id": budget.id,
+                    "recommendation_type": "budget",
+                    "message": (
+                        f"You have already used "
+                        f"{budget.actual_usage:.1f}% of your trip "
+                        "budget. Consider lower-cost options for "
+                        "upcoming expenses."
+                    ),
+                    "currency_id": budget.currency_id.id,
+                    "score": 85.0,
+                }
+            )
+
+        # Planned expenses exceed available budget.
+        if budget.planned_total > budget.total_budget:
+            planned_excess = (
+                budget.planned_total - budget.total_budget
+            )
+
+            recommendations |= self.create(
+                {
+                    "name": "Planned cost exceeds budget",
+                    "trip_id": trip_id,
+                    "budget_id": budget.id,
+                    "recommendation_type": "budget",
+                    "message": (
+                        f"Your planned trip cost is "
+                        f"{planned_excess:.2f} above the available "
+                        "budget. Reduce one or more planned expense "
+                        "categories."
+                    ),
+                    "estimated_saving": planned_excess,
+                    "currency_id": budget.currency_id.id,
+                    "score": 90.0,
+                }
+            )
+
+        # Detect category-level overspending.
+        category_checks = [
+            (
+                "transport",
+                budget.transport_budget,
+                budget.actual_transport,
+            ),
+            (
+                "stay",
+                budget.accommodation_budget,
+                budget.actual_accommodation,
+            ),
+            (
+                "food",
+                budget.food_budget,
+                budget.actual_food,
+            ),
+            (
+                "activities",
+                budget.activity_budget,
+                budget.actual_activity,
+            ),
+            (
+                "other",
+                budget.other_budget,
+                budget.actual_other,
+            ),
+        ]
+
+        for (
+            category_name,
+            planned_amount,
+            actual_amount,
+        ) in category_checks:
+
+            if planned_amount <= 0:
+                continue
+
+            if actual_amount <= planned_amount:
+                continue
+
+            overspent = actual_amount - planned_amount
+
+            overspend_percent = (
+                overspent / planned_amount
+            ) * 100
+
+            if overspend_percent < 10:
+                continue
+
+            recommendations |= self.create(
+                {
+                    "name": (
+                        f"{category_name.title()} spending is high"
+                    ),
+                    "trip_id": trip_id,
+                    "budget_id": budget.id,
+                    "recommendation_type": "budget",
+                    "message": (
+                        f"Actual {category_name} spending is "
+                        f"{overspend_percent:.1f}% above the planned "
+                        f"amount. Review upcoming {category_name} "
+                        "expenses and consider lower-cost "
+                        "alternatives."
+                    ),
+                    "estimated_saving": overspent,
+                    "currency_id": budget.currency_id.id,
+                    "score": 80.0,
+                }
+            )
+
+        # Identify largest planned cost category.
+        category_amounts = {
+            "transport": budget.transport_budget,
+            "stay": budget.accommodation_budget,
+            "food": budget.food_budget,
+            "activities": budget.activity_budget,
+            "other": budget.other_budget,
+        }
+
+        largest_category = max(
+            category_amounts,
+            key=category_amounts.get,
+        )
+
+        largest_amount = category_amounts[
+            largest_category
+        ]
+
+        if (
+            budget.total_budget > 0
+            and largest_amount
+            > budget.total_budget * optimization_ratio
+        ):
+            possible_saving = (
+                largest_amount * saving_ratio
+            )
+
+            recommendations |= self.create(
+                {
+                    "name": (
+                        f"Optimize {largest_category} cost"
+                    ),
+                    "trip_id": trip_id,
+                    "budget_id": budget.id,
+                    "recommendation_type": "budget",
+                    "message": (
+                        f"{largest_category.title()} represents a "
+                        "large share of your planned budget. "
+                        "Comparing lower-cost alternatives could "
+                        "reduce your overall trip cost."
+                    ),
+                    "estimated_saving": possible_saving,
+                    "currency_id": budget.currency_id.id,
+                    "score": 70.0,
+                }
+            )
+
+        return recommendations
+
+    def action_refresh_budget_recommendations(self):
+        """Regenerate budget recommendations for selected trips."""
+
+        trips = self.mapped("trip_id")
+
+        if not trips:
+            return True
+
+        self.filtered(
+            lambda recommendation: (
+                recommendation.recommendation_type == "budget"
+                and recommendation.state == "new"
+            )
+        ).unlink()
+
+        created_recommendations = self.browse()
+
+        for trip in trips:
+            created_recommendations |= (
+                self.generate_budget_recommendations(
+                    trip.id
+                )
+            )
+
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Trip Recommendations",
+            "res_model": "globetrotter.recommendation",
+            "view_mode": "list,form",
+            "domain": [
+                (
+                    "id",
+                    "in",
+                    created_recommendations.ids,
+                )
+            ],
+        }
