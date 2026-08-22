@@ -5,5 +5,6 @@
 	<menuitem id="menu_globetrotter_planning" name="Planning" parent="menu_globetrotter_root" sequence="10"/>
 	<menuitem id="menu_globetrotter_trips" name="Trips" parent="menu_globetrotter_planning" action="action_globetrotter_trip" sequence="10"/>
 	<menuitem id="menu_globetrotter_trip_stops" name="Trip Stops" parent="menu_globetrotter_planning" action="action_globetrotter_trip_stop" sequence="20"/>
+	<menuitem id="menu_globetrotter_budget" name="Budget" parent="menu_globetrotter_root" action="action_globetrotter_budget" sequence="15"/>
 	<menuitem id="menu_globetrotter_cities" name="Cities" parent="menu_globetrotter_root" action="action_globetrotter_city" sequence="20"/>
 </odoo>

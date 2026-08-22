@@ -138,7 +138,7 @@
                     domain="[('is_over_budget', '=', True)]"
                 />
 
-                <group expand="0" string="Group By">
+                <group>
                     <filter
                         string="Trip"
                         name="group_by_trip"
@@ -147,5 +147,12 @@
                 </group>
             </search>
         </field>
+    </record>
+
+    <record id="action_globetrotter_budget" model="ir.actions.act_window">
+        <field name="name">Trip Budgets</field>
+        <field name="res_model">globetrotter.budget</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_globetrotter_budget_search"/>
     </record>
 </odoo>

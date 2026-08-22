@@ -77,7 +77,7 @@
                     domain="[('prefers_low_cost', '=', True)]"
                 />
 
-                <group expand="0" string="Group By">
+                <group>
                     <filter
                         string="Travel Style"
                         name="group_by_travel_style"
