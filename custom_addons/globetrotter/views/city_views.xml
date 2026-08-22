@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_globetrotter_city_list" model="ir.ui.view">
+        <field name="name">globetrotter.city.list</field>
+        <field name="model">globetrotter.city</field>
+        <field name="arch" type="xml">
+            <list string="Cities">
+                <field name="name"/>
+                <field name="country_id"/>
+                <field name="state_id"/>
+                <field name="popularity"/>
+                <field name="cost_index"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_globetrotter_city_form" model="ir.ui.view">
+        <field name="name">globetrotter.city.form</field>
+        <field name="model">globetrotter.city</field>
+        <field name="arch" type="xml">
+            <form string="City">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="City Name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Location">
+                            <field name="country_id"/>
+                            <field name="state_id"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                        </group>
+                        <group string="City Details">
+                            <field name="popularity"/>
+                            <field name="cost_index"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+
+                    <group string="Description">
+                        <field name="description"/>
+                    </group>
+
+                    <group string="Image">
+                        <field name="image_1920" widget="image"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_globetrotter_city_search" model="ir.ui.view">
+        <field name="name">globetrotter.city.search</field>
+        <field name="model">globetrotter.city</field>
+        <field name="arch" type="xml">
+            <search string="Search Cities">
+                <field name="name"/>
+                <field name="country_id"/>
+                <field name="state_id"/>
+
+                <filter
+                    name="active"
+                    string="Active"
+                    domain="[('active', '=', True)]"
+                />
+
+                <group expand="0" string="Group By">
+                    <filter
+                        name="group_by_country"
+                        string="Country"
+                        context="{'group_by': 'country_id'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>
